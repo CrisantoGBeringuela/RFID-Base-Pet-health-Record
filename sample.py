@@ -63,9 +63,6 @@ def view_image():
 
 
 
-
-
-
 upload_btn = CTkButton(root, text="Upload Image", command=upload_image)
 upload_btn.pack(padx=20, pady= 10)
 

@@ -15,6 +15,12 @@ from PIL import Image,ImageTk #to support jpeg format
 import pandas   #FOR CSV
 import customtkinter as ctk
 import shutil
+import io
+
+
+
+selected_binary_data = None
+
 
 #------------------------------------------------------------------------------------------------------------------
 #MODULE CONFIGURATION
@@ -263,115 +269,139 @@ def update_button():
 
     rfidinfoentry.config(state='readonly')
 #------------------------------------------------------------------------------------------------------------------
-#VIEW PET DETAILS BUTTON (FUNCTION)
 def show_pet_details():
     selected_item = information.focus()
     if selected_item:
         values = information.item(selected_item, 'values')
-
         if values:
-            #TOPLEVEL FOR PET DETAILS
-            details_window = CTkToplevel(window)
-            details_window.title("Pet/Owner Details")
-            details_window.geometry('1170x650')
-            details_window.resizable(False, False)
-            details_window.grab_set()
+            selected_rfid = values[1]  # Assuming RFID_Number is at index 1
+
+            # Fetch image associated with this RFID
+            mycursor.execute('SELECT tb_PetImage FROM tb_picture WHERE RFID_Number = %s ORDER BY tb_id DESC LIMIT 1',
+                             (selected_rfid,))
+            result = mycursor.fetchone()
+
+    # If an image is found, display it
+    if result:
+        selected_binary_data = result[0]
+        img_data = io.BytesIO(selected_binary_data)
+        img = Image.open(img_data)
+        img = img.resize((300, 300))  # Resize image to fit within the window
+        img_tk = CTkImage(light_image=img, size=(300, 300))  # Use CTkImage for display
+
+        # Create a new window to display pet details
+        selected_item = information.focus()
+        if selected_item:
+            values = information.item(selected_item, 'values')
+
+            if values:
+                # Create the details window
+                details_window = CTkToplevel(window)
+                details_window.title("Pet/Owner Details")
+                details_window.geometry('1170x650')
+                details_window.resizable(False, False)
+                details_window.grab_set()
+
+                details_windowBG = CTkImage(dark_image=Image.open('bg1.jpg'), size=(1170, 650))
+                details_windowBGLabel = CTkLabel(details_window, image=details_windowBG, text='')
+                details_windowBGLabel.place(x=0, y=0)
+
+                mainframe = CTkFrame(details_window, width=1070, height=600, border_color='#6A9C89', border_width=2,
+                                     fg_color='#C7DBB8')
+                mainframe.place(x=45, y=10)
+
+                details_windowFrame = CTkFrame(details_window, width=900, height=700, border_color='#C7DBB8',
+                                               border_width=2, fg_color='#C7DBB8')
+                details_windowFrame.place(x=50, y=15)
+
+                # Initialize the viewPetPicture frame before using it
+                viewPetPicture = CTkFrame(mainframe, width=350, height=350, fg_color='white', border_width=2,
+                                          border_color='green')
+                viewPetPicture.place(x=700, y=10)
+
+                # Now you can place the image inside the frame
+                label = CTkLabel(viewPetPicture, image=img_tk, text='')  # Use the frame here
+                label.image = img_tk  # Keep reference to avoid garbage collection
+                label.place(x=0, y=0)
+
+                labels = ['I.D', 'RFID Number', 'Name', 'Address', 'Contact Number', 'Email address',
+                          "Pet's Name", "Pet's Age", "Pet's Gender", 'Breed', 'Species']
+
+                # Display pet details in the new window
+                for i, value in enumerate(values):
+                    if i < len(labels):
+                        title_label = CTkLabel(details_windowFrame, text=f"{labels[i]}:", font=('Arial', 20, 'bold'),
+                                               text_color='#557C56', fg_color='transparent')
+                        title_label.grid(row=i, column=0, sticky="w", padx=10, pady=5)
+
+                        value_label = CTkLabel(details_windowFrame, text=value, font=('Arial', 18, 'italic'),
+                                               text_color='Black')
+                        value_label.grid(row=i, column=1, sticky="w", padx=15, pady=5)
+
+                # Scrollable table for diagnosis history
+                diagnosis_frame = CTkFrame(details_window, width=80, height=15)
+                diagnosis_frame.place(x=680, y=200)
+
+                diagnosis_table_frame = Frame(diagnosis_frame)
+                diagnosis_table_frame.grid(row=1, column=0, columnspan=2)
+
+                scroll_y = Scrollbar(diagnosis_table_frame, orient=VERTICAL)
+                diagnosis_table = ttk.Treeview(diagnosis_table_frame, columns=("date", "diagnosis"), show='headings',
+                                               yscrollcommand=scroll_y.set, height=10)
+
+                scroll_y.config(command=diagnosis_table.yview)
+                scroll_y.pack(side=RIGHT, fill=Y)
+
+                diagnosis_table.heading("date", text="Date")
+                diagnosis_table.heading("diagnosis", text="Diagnosis")
+
+                diagnosis_table.pack(fill=BOTH, expand=1)
+
+                # Fetch diagnosis data for the selected pet (using RFID number)
+                try:
+                    query = "SELECT `date`, `diagnosis` FROM tb_diagdate WHERE RFID_Number = %s"
+                    mycursor.execute(query, (values[1],))  # Use RFID Number to fetch diagnosis history
+                    diagnosis_data = mycursor.fetchall()
+
+                    for diag in diagnosis_data:
+                        diagnosis_table.insert("", END, values=diag)
+
+                except pymysql.Error as e:
+                    messagebox.showerror('Error', f"Error fetching diagnosis: {e}")
+
+                # Event binding for double-click to show full diagnosis
+                def on_double_click(event):
+                    selected_diag_item = diagnosis_table.focus()
+                    if selected_diag_item:
+                        diag_values = diagnosis_table.item(selected_diag_item, 'values')
+                        if diag_values:
+                            full_diagnosis_window = CTkToplevel(details_window)
+                            full_diagnosis_window.title("Full Diagnosis Details")
+                            full_diagnosis_window.geometry('500x300')
+                            full_diagnosis_window.grab_set()
+
+                            date_label = CTkLabel(full_diagnosis_window, text=f"Date: {diag_values[0]}",
+                                                  font=('Arial', 18, 'bold'), text_color='Red')
+                            date_label.pack(pady=10)
+
+                            diagnosis_label = CTkLabel(full_diagnosis_window, text=f"Diagnosis: {diag_values[1]}",
+                                                       font=('Arial', 18, 'italic'), text_color='Black', wraplength=450)
+                            diagnosis_label.pack(pady=10)
+
+                diagnosis_table.bind("<Double-1>", on_double_click)
+
+                # Buttons for editing and deleting diagnosis
+                edit_details_Button = CTkButton(details_window, text='Edit Diagnosis', width=210, height=60,
+                                                font=("arial", 16, 'bold'), border_width=2, corner_radius=0,
+                                                border_color='#1A5319', fg_color="#387478", hover_color='#729762')
+                edit_details_Button.place(x=680, y=528)
+
+                delete_details_Button = CTkButton(details_window, text='Delete Diagnosis', width=210, height=60,
+                                                  font=("arial", 16, 'bold'), border_width=2, corner_radius=0,
+                                                  border_color='#1A5319', fg_color="#387478", hover_color='#729762')
+                delete_details_Button.place(x=885, y=528)
 
 
-            details_windowBG = CTkImage(dark_image=Image.open('bg1.jpg'),size=(1170,650))
-            details_windowBGLabel = CTkLabel(details_window,image=details_windowBG,text='')
-            details_windowBGLabel.place(x=0, y=0)
-
-            mainframe = CTkFrame(details_window, width=1070, height=600, border_color='#6A9C89',
-                                                border_width=2, fg_color='#C7DBB8')
-            mainframe.place(x=45, y=10)
-
-            details_windowFrame = CTkFrame(details_window, width=900, height=700,border_color='#C7DBB8',border_width=2, fg_color='#C7DBB8')
-            details_windowFrame.place(x= 50, y=15)
-
-
-
-
-            labels = ['I.D', 'RFID Number', 'Name', 'Address', 'Contact Number', 'Email address',
-                      "Pet's Name", "Pet's Age", "Pet's Gender", 'Breed', 'Species']
-
-            #PET DETAIL DISPLAY INSIDE TOPLEVEL
-            for i, value in enumerate(values):
-                if i < len(labels):
-
-
-                    title_label = CTkLabel(details_windowFrame, text=f"{labels[i]}:", font=('Arial', 20, 'bold'),
-                                           text_color='#557C56',fg_color='transparent')
-                    title_label.grid(row=i, column=0, sticky="w", padx=10, pady=5)
-
-                    value_label = CTkLabel(details_windowFrame, text=value, font=('Arial', 18, 'italic'), text_color='Black')
-                    value_label.grid(row=i, column=1, sticky="w", padx=15, pady=5)
-
-            # Diagnosis and Date Table Section
-            diagnosis_frame = CTkFrame(details_window, width=80, height=15)
-            diagnosis_frame.place(x=680, y=200)
-
-            #diagnosis_label = CTkLabel(details_windowFrame, text="Diagnosis History:", font=('Arial', 18, 'bold'),fg_color='white')
-            #diagnosis_label.grid(row=0, column=0, sticky="w")
-
-            # Scrollable Table for Diagnosis History
-            diagnosis_table_frame = Frame(diagnosis_frame)
-            diagnosis_table_frame.grid(row=1, column=0, columnspan=2)
-
-            scroll_y = Scrollbar(diagnosis_table_frame, orient=VERTICAL)
-
-            diagnosis_table = ttk.Treeview(diagnosis_table_frame, columns=("date", "diagnosis"), show='headings',
-                                           yscrollcommand=scroll_y.set, height=10)
-
-            scroll_y.config(command=diagnosis_table.yview)
-            scroll_y.pack(side=RIGHT, fill=Y)
-
-
-            diagnosis_table.heading("date", text="Date")
-            diagnosis_table.heading("diagnosis", text="Diagnosis")
-
-            diagnosis_table.pack(fill=BOTH, expand=1)
-
-            # Query the tb_diagdate table to get diagnosis history for this pet's RFID
-            try:
-                query = "SELECT `date`, `diagnosis` FROM tb_diagdate WHERE RFID_Number = %s"
-                mycursor.execute(query, (values[1],))  # Use RFID Number to fetch diagnosis history
-                diagnosis_data = mycursor.fetchall()
-
-                for diag in diagnosis_data:
-                    diagnosis_table.insert("", END, values=diag)
-
-            except pymysql.Error as e:
-                messagebox.showerror('Error', f"Error fetching diagnosis: {e}")
-
-            # Event binding for double-click to show full diagnosis
-            def on_double_click(event):
-                selected_diag_item = diagnosis_table.focus()
-                if selected_diag_item:
-                    diag_values = diagnosis_table.item(selected_diag_item, 'values')
-                    if diag_values:
-                        # Open a new window to show the full diagnosis and date
-                        full_diagnosis_window = CTkToplevel(details_window)
-                        full_diagnosis_window.title("Full Diagnosis Details")
-                        full_diagnosis_window.geometry('500x300')
-                        full_diagnosis_window.grab_set()
-
-                        # Display full diagnosis text
-                        date_label = CTkLabel(full_diagnosis_window, text=f"Date: {diag_values[0]}",
-                                              font=('Arial', 18, 'bold'), text_color='Red')
-                        date_label.pack(pady=10)
-
-                        diagnosis_label = CTkLabel(full_diagnosis_window, text=f"Diagnosis: {diag_values[1]}",
-                                                   font=('Arial', 18, 'italic'), text_color='Black', wraplength=450)
-                        diagnosis_label.pack(pady=10)
-
-            # Bind the double-click event to the diagnosis table
-            diagnosis_table.bind("<Double-1>", on_double_click)
-
-            edit_details_Button = CTkButton(details_window,text='Edit Diagnosis',width=210,height=60,font=("arial",16,'bold'),border_width=2,corner_radius=0,border_color='#1A5319',fg_color="#387478",hover_color='#729762')
-            edit_details_Button.place(x=680, y=528)
-            delete_details_Button = CTkButton(details_window, text='Delete Diagnosis', width=210, height=60,font=("arial", 16, 'bold'),border_width=2,corner_radius=0, border_color='#1A5319',fg_color="#387478", hover_color='#729762')
-            delete_details_Button.place(x=885, y=528)
 #------------------------------------------------------------------------------------------------------------------
 #CUSTOMER INFO (SHOW DATA)
 def show_data():
@@ -426,8 +456,11 @@ def delete_data():
 
 #------------------------------------------------------------------------------------------------------------------
 #ADD PET INFORMATION
+
 def addpetinfo():
+
     def add_data():
+        global selected_binary_data
         if (rfidinfoentry.get() == '' or
                 parentinfoentry.get() == '' or
                 addressentry.get() == '' or
@@ -463,6 +496,18 @@ def addpetinfo():
                     con.commit()  # Commit changes to the database
                     result = messagebox.showinfo('Confirm', 'Data added successfully, Information added successfully', parent=addpet_window)
                     if result:
+                        if selected_binary_data:
+                            try:
+                                mycursor.execute(
+                                    "INSERT INTO tb_picture (tb_PetImage, RFID_Number) VALUES (%s, %s) ",
+                                    (selected_binary_data, rfidinfoentry.get())
+                                )
+                                con.commit()
+                            except pymysql.Error as e:
+                                messagebox.showwarning('Warning', 'Image not save', parent=addpet_window)
+
+
+
                         addpet_window.destroy()
                     else:
                         pass
@@ -481,69 +526,113 @@ def addpetinfo():
             except pymysql.Error as e:
                 messagebox.showerror('Error', f"Error occurred: {e}")
 
+    def pet_uploadImage():
+        global selected_binary_data
+        file_path = filedialog.askopenfilename(filetypes=[("Image Files", "*.png;*.jpg;*.jpeg")])
+        if file_path:
+            with open(file_path, 'rb') as f:
+                selected_binary_data = f.read()
+                # mycursor.execute("INSERT INTO tb_picture (tb_PetImage) values (%s) ", (binary_data,))
+                # con.commit()
+
+                img = Image.open(file_path)
+                img = img.resize((248, 248))
+                img_tk = CTkImage(light_image=img, size=(248, 248))
+
+                label = CTkLabel(petpictureFrame, image=img_tk, text="")
+                label.image = img_tk
+                label.place(x=3, y=3)
+
 
 
     #window for entering pet/owner's info
     addpet_window = CTkToplevel(window)
     addpet_window.title("ADD PET/OWNER'S INFORMATION")
+    addpet_window.geometry('1440x490+80+90')
     addpet_window.resizable(False, False)
     addpet_window.grab_set()
 
+    addpet_BG = CTkImage(dark_image=Image.open('bg1.jpg'),size=(1440,800))
+    addpet_BGLabel = CTkLabel(addpet_window,image=addpet_BG,text='')
+    addpet_BGLabel.place(x=0,y=0)
+    #for ownersFrame
+    addpetbackground = CTkFrame (addpet_window,fg_color='#C7DBB8',width= 530, height=340,border_width=2,border_color='green' )
+    addpetbackground.place(x=50,y=50)
+    #for petFrame
+    addpetFrame = CTkFrame (addpet_window,fg_color='#C7DBB8',width= 790, height=340,border_width=2,border_color='green' )
+    addpetFrame.place(x=600,y=50)
+    # ================================================ PICTURE IMPORT ===============================================
+    petpictureFrame = CTkFrame (addpetFrame,fg_color='white',width=255, height=255,border_color='green',border_width=2)
+    petpictureFrame.place(x=490,y=30)
+
+    petpictureButton = CTkButton (addpetFrame,text='Add Photo',command=pet_uploadImage,font=("arial",16,'bold'),width=255,border_width=1,border_color='#1A5319',fg_color="#387478",hover_color='#729762')
+    petpictureButton.place(x=490,y=295)
 
 
-    #entry field
-    rfidinfolabel = Label(addpet_window, text="RFID NUMBER : ", font=('Arial', 15, 'bold'))
-    rfidinfolabel.grid(row=0, column=0, padx=30, pady=15, sticky=W)
-    rfidinfoentry = Entry(addpet_window, font=('Arial', 15, 'italic'), width=24)
-    rfidinfoentry.grid(row=0, column=1, pady=15, padx=10)
+#================================================ OWNERS INFORMATION ===============================================
+    parentinformation = Label (addpetbackground,text="Owner's Information",font=('Arial',15,'bold'),bg='#C7DBB8')
+    parentinformation.place(x=20,y=10)
 
-    parentinfolabel = Label(addpet_window, text="PARENT'S NAME : ", font=('Arial', 15, 'bold'))
-    parentinfolabel.grid(row=1, column=0, padx=30, pady=15, sticky=W)
-    parentinfoentry = Entry(addpet_window, font=('Arial', 15, 'italic'), width=24)
-    parentinfoentry.grid(row=1, column=1, pady=15, padx=10)
+    #1
+    rfidinfolabel = Label(addpetbackground, text="RFID Number      : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
+    rfidinfolabel.place(x=50,y=50)
+    rfidinfoentry = Entry(addpetbackground, font=('Arial', 13, 'italic'), width=30)
+    rfidinfoentry.place(x=190,y=50)
+    #2
+    parentinfolabel = Label(addpetbackground, text="Parent's Name    : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
+    parentinfolabel.place(x=50,y=100)
+    parentinfoentry = Entry(addpetbackground, font=('Arial', 13, 'italic'), width=30)
+    parentinfoentry.place(x=190,y=100)
 
-    addresslabel = Label(addpet_window, text="Address : ", font=('Arial', 15, 'bold'))
-    addresslabel.grid(row=2, column=0, padx=30, pady=15, sticky=W)
-    addressentry = Entry(addpet_window, font=('Arial', 15, 'italic'), width=24)
-    addressentry.grid(row=2, column=1, pady=15, padx=10)
+    p_i_instruction = Label(addpetbackground,text= "(  Surname , Given Name , Middle Initial  )",font=('arial',9,'italic'),bg='#C7DBB8')
+    p_i_instruction.place(x=200,y=129)
 
-    contactnumlabel = Label(addpet_window, text="Contact Number : ", font=('Arial', 15, 'bold'))
-    contactnumlabel.grid(row=3, column=0, padx=30, pady=15, sticky=W)
-    contactnumentry = Entry(addpet_window, font=('Arial', 15, 'italic'), width=24)
-    contactnumentry.grid(row=3, column=1, pady=15, padx=10)
+    #4
+    addresslabel = Label(addpetbackground, text="Address                : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
+    addresslabel.place(x=50,y=200)
+    addressentry = Entry(addpetbackground, font=('Arial', 13, 'italic'), width=30)
+    addressentry.place(x=190,y=200)
+    #3
+    contactnumlabel = Label(addpetbackground, text="Contact Number : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
+    contactnumlabel.place(x=50,y=150)
+    contactnumentry = Entry(addpetbackground, font=('Arial', 13, 'italic'), width=30)
+    contactnumentry.place(x=190,y=150)
+    #5
+    emaillabel = Label(addpetbackground, text="E-mail Address   : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
+    emaillabel.place(x=50,y=250)
+    emailentry = Entry(addpetbackground, font=('Arial', 13, 'italic'), width=30)
+    emailentry.place(x=190,y=250)
+# ================================================ PETS INFORMATION ===============================================
+    petinformation = Label(addpetFrame, text="Pet's Information", font=('Arial', 15, 'bold'), bg='#C7DBB8')
+    petinformation.place(x=20, y=10)
+    #1
+    petnamelabel = Label(addpetFrame, text="Pet's Name          : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
+    petnamelabel.place(x=50,y=50)
+    petnameentry = Entry(addpetFrame, font=('Arial', 13, 'italic'), width=30)
+    petnameentry.place(x=190,y=50)
+    #2
+    petagelabel = Label(addpetFrame, text="Pet's Age              : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
+    petagelabel.place(x=50,y=100)
+    petageentry = Entry(addpetFrame, font=('Arial', 13, 'italic'), width=30)
+    petageentry.place(x=190,y=100)
+    #3
+    petgenderlabel = Label(addpetFrame, text="Pet's Gender       : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
+    petgenderlabel.place(x=50,y=150)
+    petgenderentry = Entry(addpetFrame, font=('Arial', 13, 'italic'), width=30)
+    petgenderentry.place(x=190,y=150)
+    #4
+    breedlabel = Label(addpetFrame, text="Pet's Breed          : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
+    breedlabel.place(x=50,y=200)
+    breedentry = Entry(addpetFrame, font=('Arial', 13, 'italic'), width=30)
+    breedentry.place(x=190,y=200)
+    #5
+    specieslabel = Label(addpetFrame, text="Pet's Species      : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
+    specieslabel.place(x=50,y=250)
+    speciesentry = Entry(addpetFrame, font=('Arial', 12, 'italic'), width=30)
+    speciesentry.place(x=190,y=250)
 
-    emaillabel = Label(addpet_window, text="E-mail Address : ", font=('Arial', 15, 'bold'))
-    emaillabel.grid(row=4, column=0, padx=30, pady=15, sticky=W)
-    emailentry = Entry(addpet_window, font=('Arial', 15, 'italic'), width=24)
-    emailentry.grid(row=4, column=1, pady=15, padx=10)
-
-    petnamelabel = Label(addpet_window, text="Pet's Name : ", font=('Arial', 15, 'bold'))
-    petnamelabel.grid(row=5, column=0, padx=30, pady=15, sticky=W)
-    petnameentry = Entry(addpet_window, font=('Arial', 15, 'italic'), width=24)
-    petnameentry.grid(row=5, column=1, pady=15, padx=10)
-
-    petagelabel = Label(addpet_window, text="Pet's Age : ", font=('Arial', 15, 'bold'))
-    petagelabel.grid(row=6, column=0, padx=30, pady=15, sticky=W)
-    petageentry = Entry(addpet_window, font=('Arial', 15, 'italic'), width=24)
-    petageentry.grid(row=6, column=1, pady=15, padx=10)
-
-    petgenderlabel = Label(addpet_window, text="Pet's Gender : ", font=('Arial', 15, 'bold'))
-    petgenderlabel.grid(row=7, column=0, padx=30, pady=15, sticky=W)
-    petgenderentry = Entry(addpet_window, font=('Arial', 15, 'italic'), width=24)
-    petgenderentry.grid(row=7, column=1, pady=15, padx=10)
-
-    breedlabel = Label(addpet_window, text="Pet's Breed : ", font=('Arial', 15, 'bold'))
-    breedlabel.grid(row=8, column=0, padx=30, pady=15, sticky=W)
-    breedentry = Entry(addpet_window, font=('Arial', 15, 'italic'), width=24)
-    breedentry.grid(row=8, column=1, pady=15, padx=10)
-
-    specieslabel = Label(addpet_window, text="Pet's Species  : ", font=('Arial', 15, 'bold'))
-    specieslabel.grid(row=9, column=0, padx=30, pady=15, sticky=W)
-    speciesentry = Entry(addpet_window, font=('Arial', 15, 'italic'), width=24)
-    speciesentry.grid(row=9, column=1, pady=15, padx=10)
-
-    submitbutton = CTkButton(addpet_window, text='Submit', command=add_data)
-    submitbutton.grid(row=10, columnspan=2, pady=15, padx=10)
+    submitbutton = CTkButton(addpet_window, text='Submit', command=add_data,width=250,height=45,font=("arial",16,'bold'),border_width=2,border_color='#1A5319',fg_color="#387478",hover_color='#729762')
+    submitbutton.place(x=1092,y=410)
 
 #def calendarboard():
  #   window.destroy()
