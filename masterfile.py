@@ -641,9 +641,14 @@ def addpetinfo():
 #ADD PET DIAGNOSIS
 def add_petdiagnosis():
     def add_data():
-        if rfidinfoentry.get() == '' or diagnosisentry.get() == '':
+
+        rfid = rfidinfoentry.get().strip()
+        diagnosis_text = diagnosisentry.get("1.0", "end").strip()
+
+        if rfidinfoentry.get() == '' or diagnosis_text == '':
             messagebox.showerror('Error', 'All fields are required', parent=addpet_window)
             return
+
 
         # Check if RFID Number exists in tb_customerinfo
         check_query = "SELECT * FROM tb_customerinfo WHERE RFID_Number = %s"
@@ -657,44 +662,57 @@ def add_petdiagnosis():
         try:
             # Insert data into tb_diagdate table with current date
             query = '''
-            INSERT INTO tb_diagdate (diagnosis, RFID_Number, `date`) 
-            VALUES (%s, %s, CURDATE())
-            '''
-            mycursor.execute(query, (
-                diagnosisentry.get(),  # Diagnosis
-                rfidinfoentry.get(),   # RFID Number
-            ))
-            con.commit()  # Commit changes to the database
+               INSERT INTO tb_diagdate (diagnosis, RFID_Number, `date`) 
+               VALUES (%s, %s, CURDATE())
+               '''
+            mycursor.execute(query, (diagnosis_text, rfid))
+            con.commit()
             messagebox.showinfo('Success', 'Diagnosis added successfully', parent=addpet_window)
 
-            # Close the add window after successful insertion
             addpet_window.destroy()
-
-            # Refresh the data in the treeview
-            show_data()  # This will reload data, including new diagnosis
+            show_data()
 
         except pymysql.Error as e:
-            messagebox.showerror('Error', f"Error occurred: {e}")
+            messagebox.showerror('Error', f"Error occurred: {e}", parent=addpet_window)
 
     # Window for entering pet/owner's info
     addpet_window = CTkToplevel(window)
     addpet_window.title("ADD PET/OWNER'S INFORMATION")
     addpet_window.resizable(False, False)
     addpet_window.grab_set()
+    addpet_window.geometry('470x500+50+50')
+
+
+
+    addpetBG = CTkImage(dark_image=Image.open('bg2.jpg'), size=(750, 750))
+    addpetBGlabel = CTkLabel(addpet_window, image=addpetBG, text='')
+    addpetBGlabel.place(x=0, y=0)
+
+    addpetframe = CTkFrame(addpet_window, width=370, height=300, border_color='#6A9C89', border_width=4,fg_color='#C7DBB8')
+    addpetframe.place(x=50, y=62)
+
 
     # Entry fields for RFID and Diagnosis
-    rfidinfolabel = Label(addpet_window, text="RFID NUMBER: ", font=('Arial', 15, 'bold'))
-    rfidinfolabel.grid(row=0, column=0, padx=30, pady=15, sticky=W)
-    rfidinfoentry = Entry(addpet_window, font=('Arial', 15, 'italic'), width=24)
-    rfidinfoentry.grid(row=0, column=1, pady=15, padx=10)
+    rfidinfolabel = CTkLabel(addpet_window, text="RFID Number: ", font=('Arial', 15, 'bold'),fg_color='#C7DBB8')
+    rfidinfolabel.place(x=80,y=100)
+    rfidinfoentry = CTkEntry(addpet_window, font=('Arial', 15, 'italic'), width=300)
+    rfidinfoentry.place(x=85,y=135)
 
-    diagnosislabel = Label(addpet_window, text="DIAGNOSIS: ", font=('Arial', 15, 'bold'))
-    diagnosislabel.grid(row=1, column=0, padx=30, pady=15, sticky=W)
-    diagnosisentry = Entry(addpet_window, font=('Arial', 15, 'italic'), width=24)
-    diagnosisentry.grid(row=1, column=1, pady=15, padx=10)
+    diagnosislabel = CTkLabel(addpet_window, text="Remarks: ", font=('Arial', 15, 'bold'),fg_color='#C7DBB8')
+    diagnosislabel.place(x=80,y=170)
+    diagnosisentry = CTkTextbox(addpet_window, font=('Arial', 12, 'italic'), width=300,height=90)
+    diagnosisentry.place(x=85,y=200)
 
-    submitbutton = CTkButton(addpet_window, text='Submit', command=add_data)
-    submitbutton.grid(row=7, columnspan=2, pady=15, padx=10)
+
+    remarks_one= CTkLabel(addpet_window, text= 'Put the exact diagnosis or remarks for the patient (pet)',font=('Arial',12,'italic'),fg_color='#C7DBB8')
+    remarks_one.place(x=85,y=295)
+    remarks_one = CTkLabel(addpet_window, text='(Example for; Vaccine, deworm, Capon, etc.;)',font=('Arial', 12, 'italic'), fg_color='#C7DBB8')
+    remarks_one.place(x=85, y=315)
+
+    submitbutton = CTkButton(addpet_window,text='SUBMIT', font=("Arial", 16, 'bold'), compound='right',
+                             text_color='#FFEAC5', corner_radius=10, hover_color='#83c7ac', fg_color='#16423C',
+                             border_color='#16423C', border_width=1, width=200, height=40,command=add_data)
+    submitbutton.place(x=125,y=380)
 
 
 #------------------------------------------------------------------------------------------------------------------
@@ -846,7 +864,7 @@ def addnewEmployee():
 
     addnewEmployee = CTkToplevel(window)
     addnewEmployee.geometry('750x750+300+150')
-    addnewEmployee.title("EMPLOYEE INFORMATION ORIGINAL")
+    addnewEmployee.title("EMPLOYEE INFORMATION")
     addnewEmployee.resizable(False, False)
     addnewEmployee.grab_set()
 

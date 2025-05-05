@@ -17,11 +17,6 @@ set_appearance_mode("light")
 def login():
     if userentry.get() == '' or passentry.get() == '':
         messagebox.showerror('Error','Please fill in the box')
-    elif userentry.get() == 'admin' and passentry.get() == 'password':
-        messagebox.showinfo('Login','Login Successfully')
-        root.destroy()
-        import rfid_customer_information
-
     elif userentry.get() == 'superuser' and passentry.get() == 'superpassword':
         messagebox.showinfo('Login', 'You are login as ADMINISTRATOR')
         root.destroy()
