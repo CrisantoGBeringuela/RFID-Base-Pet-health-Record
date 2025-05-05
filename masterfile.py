@@ -1368,13 +1368,13 @@ event_entry =  CTkEntry(window, width=182,height=100,placeholder_text="Add Event
 event_entry.place(x=980,y=470)
 
 # Add event button
-add_event_btn = CTkButton(window, text="Add Event", command=add_event,width=180,height=60,border_width=2,border_color='#1A5319',fg_color="#387478",hover_color='#729762')
+add_event_btn = CTkButton(window, text="Add Event", command=add_event,width=180,height=40,border_width=2,font=("arial",16,'bold'),border_color='#1A5319',fg_color="#387478",hover_color='#729762')
 add_event_btn.place(x=980,y=580)
 
 # Listbox to display events for selected date
 event_listbox_label =  CTkLabel(window, text="Meeting Description:",bg_color='#C7DBB8',font=('bold',16))
 event_listbox_label.place(x=1176,y=440)
-event_listbox = tk.Listbox(window, width=55, height=13)
+event_listbox = tk.Listbox(window, width=30, height=8,font=('arial',15,'italic'))
 event_listbox.place(x=1168,y=470)
 
 
