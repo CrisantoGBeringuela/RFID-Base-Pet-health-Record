@@ -1,6 +1,8 @@
 #MODULES
 import time
 import tkinter as tk
+
+from click import command
 from customtkinter import*
 from tkcalendar import Calendar
 from time import strftime
@@ -338,6 +340,36 @@ def show_pet_details():
                                                text_color='Black')
                         value_label.grid(row=i, column=1, sticky="w", padx=15, pady=5)
 
+                def fetch_data():
+                    query = 'SELECT * FROM tb_diagdate'
+                    mycursor.execute(query)
+                    fetched_data = mycursor.fetchall()
+                    diagnosis_table.delete(*diagnosis_table.get_children())
+                    for data in fetched_data:
+                        diagnosis_table.insert('', END, values=data)
+
+                def delete_remarks():
+                    indexing = diagnosis_table.focus()
+                    content = diagnosis_table.item(indexing)
+                    if not content['values']:
+                        messagebox.showerror('Error', 'No record selected', parent=details_window)
+                        return
+
+                    diag_id = content['values'][0]
+                    confirm = messagebox.askyesno('Confirm',f'Are you sure you want to delete the record ? ',parent=details_window)
+                    if not confirm:
+                        return
+                    try:
+                        query = 'DELETE FROM tb_diagdate WHERE diag_id = %s'
+                        mycursor.execute(query, (diag_id,))
+                        con.commit()
+
+                        messagebox.showinfo('DELETED', f'The record was deleted successfully', parent=details_window)
+                        fetch_data()
+                    except Exception as e:
+                        messagebox.showerror('Error', f'An error occurred: {e}', parent=details_window)
+
+
                 # Scrollable table for diagnosis history
                 diagnosis_frame = CTkFrame(details_window, width=80, height=15)
                 diagnosis_frame.place(x=680, y=200)
@@ -346,20 +378,22 @@ def show_pet_details():
                 diagnosis_table_frame.grid(row=1, column=0, columnspan=2)
 
                 scroll_y = Scrollbar(diagnosis_table_frame, orient=VERTICAL)
-                diagnosis_table = ttk.Treeview(diagnosis_table_frame, columns=("date", "diagnosis"), show='headings',
+                diagnosis_table = ttk.Treeview(diagnosis_table_frame, columns=("diag_id","diag_date", "diagnosis"), show='headings',
                                                yscrollcommand=scroll_y.set, height=10)
 
                 scroll_y.config(command=diagnosis_table.yview)
                 scroll_y.pack(side=RIGHT, fill=Y)
 
-                diagnosis_table.heading("date", text="Date")
+                diagnosis_table.heading("diag_id", text="ID")
+                diagnosis_table.column("diag_id", width=0, stretch=False)
+                diagnosis_table.heading("diag_date", text="Date")
                 diagnosis_table.heading("diagnosis", text="Diagnosis")
 
                 diagnosis_table.pack(fill=BOTH, expand=1)
 
                 # Fetch diagnosis data for the selected pet (using RFID number)
                 try:
-                    query = "SELECT `date`, `diagnosis` FROM tb_diagdate WHERE RFID_Number = %s"
+                    query = "SELECT `diag_id`,`diag_date`, `diagnosis` FROM tb_diagdate WHERE RFID_Number = %s"
                     mycursor.execute(query, (values[1],))  # Use RFID Number to fetch diagnosis history
                     diagnosis_data = mycursor.fetchall()
 
@@ -396,7 +430,7 @@ def show_pet_details():
                                                 border_color='#1A5319', fg_color="#387478", hover_color='#729762')
                 edit_details_Button.place(x=680, y=528)
 
-                delete_details_Button = CTkButton(details_window, text='Delete Diagnosis', width=210, height=60,
+                delete_details_Button = CTkButton(details_window, text='Delete Diagnosis',command=delete_remarks, width=210, height=60,
                                                   font=("arial", 16, 'bold'), border_width=2, corner_radius=0,
                                                   border_color='#1A5319', fg_color="#387478", hover_color='#729762')
                 delete_details_Button.place(x=885, y=528)
@@ -662,7 +696,7 @@ def add_petdiagnosis():
         try:
             # Insert data into tb_diagdate table with current date
             query = '''
-               INSERT INTO tb_diagdate (diagnosis, RFID_Number, `date`) 
+               INSERT INTO tb_diagdate (diagnosis, RFID_Number, `diag_date`) 
                VALUES (%s, %s, CURDATE())
                '''
             mycursor.execute(query, (diagnosis_text, rfid))
