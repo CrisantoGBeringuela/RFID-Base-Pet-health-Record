@@ -123,10 +123,25 @@ def log_out():
 #------------------------------------------------------------------------------------------------------------------
 #EXPORT BUTTON (FUNCTION)
 def export_data():
-    # CHOOSE LOCALHOST
-    url = filedialog.asksaveasfilename(defaultextension='.csv')
+    # Get selected item in the treeview
+    selected_item = information.focus()
+    if not selected_item:
+        messagebox.showerror('Error', 'No record selected')
+        return
 
-    #FETCHING THE DATA BY JOINING BOTH TABLES BASE SA RFID_NUMBER
+    selected_values = information.item(selected_item)['values']
+    if not selected_values:
+        messagebox.showerror('Error', 'Invalid selection')
+        return
+
+    rfid_number = selected_values[1]  # Assuming RFID is second column
+
+    # Ask user where to save the file
+    url = filedialog.asksaveasfilename(defaultextension='.csv')
+    if not url:
+        return
+
+    # Fetch filtered data using LEFT JOIN to include diagnosis
     query = '''
     SELECT 
         c.ID, 
@@ -140,7 +155,7 @@ def export_data():
         c.Petgender AS "Pet's Gender", 
         c.Breed, 
         c.Species, 
-        d.date, 
+        d.diag_date, 
         d.diagnosis 
     FROM 
         tb_customerinfo c 
@@ -148,22 +163,23 @@ def export_data():
         tb_diagdate d 
     ON 
         c.RFID_Number = d.RFID_Number
+    WHERE 
+        c.RFID_Number = %s
     '''
-    mycursor.execute(query)
-    fetched_data = mycursor.fetchall()
+    try:
+        mycursor.execute(query, (rfid_number,))
+        fetched_data = mycursor.fetchall()
 
-    #LIST COLUMN NAMES FOR CSV FILE FORMAT
-    columns = ['I.D', 'RFID Number', 'Name', 'Address', 'Contact Number', 'Email address',
-               "Pet's Name", "Pet's Age", "Pet's Gender", 'Breed', 'Species', 'Date', 'Diagnosis']
+        columns = ['I.D', 'RFID Number', 'Name', 'Address', 'Contact Number', 'Email address',
+                   "Pet's Name", "Pet's Age", "Pet's Gender", 'Breed', 'Species', 'Date', 'Diagnosis']
 
-    # Convert the fetched data to a pandas DataFrame
-    table = pandas.DataFrame(fetched_data, columns=columns)
+        df = pandas.DataFrame(fetched_data, columns=columns)
+        df.to_csv(url, index=False)
+        messagebox.showinfo('Success', 'Filtered data has been exported successfully')
 
-    # Save the data as a CSV file
-    table.to_csv(url, index=False)
+    except Exception as e:
+        messagebox.showerror('Error', f'Failed to export: {e}')
 
-    # Display success message
-    messagebox.showinfo('Success', 'Data is saved successfully')
 #------------------------------------------------------------------------------------------------------------------
 #UPDATE BUTTON (FUNCTION)
 def update_button():
@@ -195,64 +211,99 @@ def update_button():
     #TOP LEVEL FOR EDITING INFORMATION
     update_window = CTkToplevel()
     update_window.title("EDIT INFORMATION")
+    update_window.geometry('1440x490+80+90')
     update_window.resizable(False, False)
     update_window.grab_set()
 
-    # entry field
-    rfidinfolabel = Label(update_window, text="RFID NUMBER : ", font=('Arial', 15, 'bold'))
-    rfidinfolabel.grid(row=0, column=0, padx=30, pady=15, sticky=W)
-    rfidinfoentry = Entry(update_window, font=('Arial', 15, 'italic'), width=24)
-    rfidinfoentry.grid(row=0, column=1, pady=15, padx=10)
+    editpet_BG = CTkImage(dark_image=Image.open('bg1.jpg'), size=(1440, 800))
+    edit_BGLabel = CTkLabel(update_window, image=editpet_BG, text='')
+    edit_BGLabel.place(x=0, y=0)
+
+    # for ownersFrame
+    edit_addpetbackground = CTkFrame(update_window, fg_color='#C7DBB8', width=530, height=340, border_width=2,
+                                border_color='green')
+    edit_addpetbackground.place(x=50, y=50)
+    # for petFrame
+    edit_addpetFrame = CTkFrame(update_window, fg_color='#C7DBB8', width=790, height=340, border_width=2,
+                           border_color='green')
+    edit_addpetFrame.place(x=600, y=50)
+
+
+
+    #EDIT ================================================ OWNERS INFORMATION ===============================================
+    parentinformation = Label(edit_addpetbackground, text="Owner's Information", font=('Arial', 15, 'bold'), bg='#C7DBB8')
+    parentinformation.place(x=20, y=10)
+
+
+    #1
+    rfidinfolabel = Label(edit_addpetbackground, text="RFID Number      : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
+    rfidinfolabel.place(x=50,y=50)
+    rfidinfoentry = Entry(edit_addpetbackground, font=('Arial', 13, 'italic'), width=30)
+    rfidinfoentry.place(x=190,y=50)
 
     rfidinfoentry.bind("<Button-1>", rfid_warning)
 
-    parentinfolabel = Label(update_window, text="PARENT'S NAME : ", font=('Arial', 15, 'bold'))
-    parentinfolabel.grid(row=1, column=0, padx=30, pady=15, sticky=W)
-    parentinfoentry = Entry(update_window, font=('Arial', 15, 'italic'), width=24)
-    parentinfoentry.grid(row=1, column=1, pady=15, padx=10)
+    # 2
+    parentinfolabel = Label(edit_addpetbackground, text="Parent's Name    : ", font=('Arial', 12, 'bold'), bg='#C7DBB8')
+    parentinfolabel.place(x=50, y=100)
+    parentinfoentry = Entry(edit_addpetbackground, font=('Arial', 13, 'italic'), width=30)
+    parentinfoentry.place(x=190, y=100)
 
-    addresslabel = Label(update_window, text="Address : ", font=('Arial', 15, 'bold'))
-    addresslabel.grid(row=2, column=0, padx=30, pady=15, sticky=W)
-    addressentry = Entry(update_window, font=('Arial', 15, 'italic'), width=24)
-    addressentry.grid(row=2, column=1, pady=15, padx=10)
+    p_i_instruction = Label(edit_addpetbackground, text="(  Surname , Given Name , Middle Initial  )",
+                            font=('arial', 9, 'italic'), bg='#C7DBB8')
+    p_i_instruction.place(x=200, y=129)
 
-    contactnumlabel = Label(update_window, text="Contact Number : ", font=('Arial', 15, 'bold'))
-    contactnumlabel.grid(row=3, column=0, padx=30, pady=15, sticky=W)
-    contactnumentry = Entry(update_window, font=('Arial', 15, 'italic'), width=24)
-    contactnumentry.grid(row=3, column=1, pady=15, padx=10)
+    # 4
+    addresslabel = Label(edit_addpetbackground, text="Address                : ", font=('Arial', 12, 'bold'), bg='#C7DBB8')
+    addresslabel.place(x=50, y=200)
+    addressentry = Entry(edit_addpetbackground, font=('Arial', 13, 'italic'), width=30)
+    addressentry.place(x=190, y=200)
 
-    emaillabel = Label(update_window, text="E-mail Address : ", font=('Arial', 15, 'bold'))
-    emaillabel.grid(row=4, column=0, padx=30, pady=15, sticky=W)
-    emailentry = Entry(update_window, font=('Arial', 15, 'italic'), width=24)
-    emailentry.grid(row=4, column=1, pady=15, padx=10)
+    # 3
+    contactnumlabel = Label(edit_addpetbackground, text="Contact Number : ", font=('Arial', 12, 'bold'), bg='#C7DBB8')
+    contactnumlabel.place(x=50, y=150)
+    contactnumentry = Entry(edit_addpetbackground, font=('Arial', 13, 'italic'), width=30)
+    contactnumentry.place(x=190, y=150)
 
-    petnamelabel = Label(update_window, text="Pet's Name : ", font=('Arial', 15, 'bold'))
-    petnamelabel.grid(row=5, column=0, padx=30, pady=15, sticky=W)
-    petnameentry = Entry(update_window, font=('Arial', 15, 'italic'), width=24)
-    petnameentry.grid(row=5, column=1, pady=15, padx=10)
+    # 5
+    emaillabel = Label(edit_addpetbackground, text="E-mail Address   : ", font=('Arial', 12, 'bold'), bg='#C7DBB8')
+    emaillabel.place(x=50, y=250)
+    emailentry = Entry(edit_addpetbackground, font=('Arial', 13, 'italic'), width=30)
+    emailentry.place(x=190, y=250)
 
-    petagelabel = Label(update_window, text="Pet's Age : ", font=('Arial', 15, 'bold'))
-    petagelabel.grid(row=6, column=0, padx=30, pady=15, sticky=W)
-    petageentry = Entry(update_window, font=('Arial', 15, 'italic'), width=24)
-    petageentry.grid(row=6, column=1, pady=15, padx=10)
+    # ================================================ PETS INFORMATION ===============================================
+    petinformation = Label(edit_addpetFrame, text="Pet's Information", font=('Arial', 15, 'bold'), bg='#C7DBB8')
+    petinformation.place(x=20, y=10)
+    # 1
+    petnamelabel = Label(edit_addpetFrame, text="Pet's Name          : ", font=('Arial', 12, 'bold'), bg='#C7DBB8')
+    petnamelabel.place(x=50, y=50)
+    petnameentry = Entry(edit_addpetFrame, font=('Arial', 13, 'italic'), width=30)
+    petnameentry.place(x=190, y=50)
+    # 2
+    petagelabel = Label(edit_addpetFrame, text="Pet's Age              : ", font=('Arial', 12, 'bold'), bg='#C7DBB8')
+    petagelabel.place(x=50, y=100)
+    petageentry = Entry(edit_addpetFrame, font=('Arial', 13, 'italic'), width=30)
+    petageentry.place(x=190, y=100)
+    # 3
+    petgenderlabel = Label(edit_addpetFrame, text="Pet's Gender       : ", font=('Arial', 12, 'bold'), bg='#C7DBB8')
+    petgenderlabel.place(x=50, y=150)
+    petgenderentry = Entry(edit_addpetFrame, font=('Arial', 13, 'italic'), width=30)
+    petgenderentry.place(x=190, y=150)
+    # 4
+    breedlabel = Label(edit_addpetFrame, text="Pet's Breed          : ", font=('Arial', 12, 'bold'), bg='#C7DBB8')
+    breedlabel.place(x=50, y=200)
+    breedentry = Entry(edit_addpetFrame, font=('Arial', 13, 'italic'), width=30)
+    breedentry.place(x=190, y=200)
+    # 5
+    specieslabel = Label(edit_addpetFrame, text="Pet's Species      : ", font=('Arial', 12, 'bold'), bg='#C7DBB8')
+    specieslabel.place(x=50, y=250)
+    speciesentry = Entry(edit_addpetFrame, font=('Arial', 12, 'italic'), width=30)
+    speciesentry.place(x=190, y=250)
 
-    petgenderlabel = Label(update_window, text="Pet's Gender : ", font=('Arial', 15, 'bold'))
-    petgenderlabel.grid(row=7, column=0, padx=30, pady=15, sticky=W)
-    petgenderentry = Entry(update_window, font=('Arial', 15, 'italic'), width=24)
-    petgenderentry.grid(row=7, column=1, pady=15, padx=10)
-
-    breedlabel = Label(update_window, text="Pet's Breed : ", font=('Arial', 15, 'bold'))
-    breedlabel.grid(row=8, column=0, padx=30, pady=15, sticky=W)
-    breedentry = Entry(update_window, font=('Arial', 15, 'italic'), width=24)
-    breedentry.grid(row=8, column=1, pady=15, padx=10)
-
-    specieslabel = Label(update_window, text="Pet's Species  : ", font=('Arial', 15, 'bold'))
-    specieslabel.grid(row=9, column=0, padx=30, pady=15, sticky=W)
-    speciesentry = Entry(update_window, font=('Arial', 15, 'italic'), width=24)
-    speciesentry.grid(row=9, column=1, pady=15, padx=10)
-
-    submitbutton = CTkButton(update_window, text='Submit', command=save_data)
-    submitbutton.grid(row=10, columnspan=2, pady=15, padx=10)
+    submitbutton = CTkButton(update_window, text='Submit',command=save_data, width=250, height=45,
+                             font=("arial", 16, 'bold'), border_width=2, border_color='#1A5319', fg_color="#387478",
+                             hover_color='#729762')
+    submitbutton.place(x=1092, y=410)
 
     indexing= information.focus()
     content=information.item(indexing)
