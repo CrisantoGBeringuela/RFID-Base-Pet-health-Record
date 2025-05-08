@@ -123,62 +123,42 @@ def log_out():
 #------------------------------------------------------------------------------------------------------------------
 #EXPORT BUTTON (FUNCTION)
 def export_data():
-    # Get selected item in the treeview
-    selected_item = information.focus()
-    if not selected_item:
-        messagebox.showerror('Error', 'No record selected')
-        return
-
-    selected_values = information.item(selected_item)['values']
-    if not selected_values:
-        messagebox.showerror('Error', 'Invalid selection')
-        return
-
-    rfid_number = selected_values[1]  # Assuming RFID is second column
-
-    # Ask user where to save the file
+    # Ask where to save the file
     url = filedialog.asksaveasfilename(defaultextension='.csv')
     if not url:
         return
 
-    # Fetch filtered data using LEFT JOIN to include diagnosis
-    query = '''
-    SELECT 
-        c.ID, 
-        c.RFID_Number, 
-        c.Name, 
-        c.Address, 
-        c.cnum AS 'Contact Number', 
-        c.emailadd AS 'Email address', 
-        c.Petname AS "Pet's Name", 
-        c.Pet_age AS "Pet's Age", 
-        c.Petgender AS "Pet's Gender", 
-        c.Breed, 
-        c.Species, 
-        d.diag_date, 
-        d.diagnosis 
-    FROM 
-        tb_customerinfo c 
-    LEFT JOIN 
-        tb_diagdate d 
-    ON 
-        c.RFID_Number = d.RFID_Number
-    WHERE 
-        c.RFID_Number = %s
-    '''
-    try:
-        mycursor.execute(query, (rfid_number,))
-        fetched_data = mycursor.fetchall()
+    # Get all selected rows
+    selected_items = information.selection()
+    if not selected_items:
+        messagebox.showwarning("No selection", "Please select rows to export.")
+        return
 
-        columns = ['I.D', 'RFID Number', 'Name', 'Address', 'Contact Number', 'Email address',
-                   "Pet's Name", "Pet's Age", "Pet's Gender", 'Breed', 'Species', 'Date', 'Diagnosis']
+    export_rows = []
 
-        df = pandas.DataFrame(fetched_data, columns=columns)
-        df.to_csv(url, index=False)
-        messagebox.showinfo('Success', 'Filtered data has been exported successfully')
+    # For each selected row in Treeview, get the values
+    for item in selected_items:
+        row_data = information.item(item, 'values')
+        # Fetch diagnosis separately if needed
+        rfid_number = row_data[1]  # Assuming index 1 is RFID_Number
+        mycursor.execute("SELECT diag_date, diagnosis FROM tb_diagdate WHERE RFID_Number = %s", (rfid_number,))
+        diag_rows = mycursor.fetchall()
 
-    except Exception as e:
-        messagebox.showerror('Error', f'Failed to export: {e}')
+        if diag_rows:
+            for diag in diag_rows:
+                export_rows.append(row_data + diag)
+        else:
+            export_rows.append(row_data + ("", ""))  # No diagnosis
+
+    # Column headers
+    columns = ['I.D', 'RFID Number', 'Name', 'Address', 'Contact Number', 'Email address',
+               "Pet's Name", "Pet's Age", "Pet's Gender", 'Breed', 'Species', 'Date', 'Diagnosis']
+
+    # Use pandas to export to CSV
+    table = pandas.DataFrame(export_rows, columns=columns)
+    table.to_csv(url, index=False)
+
+    messagebox.showinfo('Success', 'Selected data has been exported.')
 
 #------------------------------------------------------------------------------------------------------------------
 #UPDATE BUTTON (FUNCTION)
