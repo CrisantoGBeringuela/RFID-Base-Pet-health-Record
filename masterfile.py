@@ -188,6 +188,8 @@ def update_button():
     def rfid_warning(event):
         messagebox.showwarning("Warning", "You cannot edit the RFID Number!", parent=update_window)
 
+
+
     #TOP LEVEL FOR EDITING INFORMATION
     update_window = CTkToplevel()
     update_window.title("EDIT INFORMATION")
@@ -209,13 +211,12 @@ def update_button():
     edit_addpetFrame.place(x=600, y=50)
 
 
-
-    #EDIT ================================================ OWNERS INFORMATION ===============================================
+    #UPDATE ================================================ OWNERS INFORMATION ===============================================
     parentinformation = Label(edit_addpetbackground, text="Owner's Information", font=('Arial', 15, 'bold'), bg='#C7DBB8')
     parentinformation.place(x=20, y=10)
 
 
-    #1
+    #1 UPDATE
     rfidinfolabel = Label(edit_addpetbackground, text="RFID Number      : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
     rfidinfolabel.place(x=50,y=50)
     rfidinfoentry = Entry(edit_addpetbackground, font=('Arial', 13, 'italic'), width=30)
@@ -223,7 +224,7 @@ def update_button():
 
     rfidinfoentry.bind("<Button-1>", rfid_warning)
 
-    # 2
+    #2 UPDATE
     parentinfolabel = Label(edit_addpetbackground, text="Parent's Name    : ", font=('Arial', 12, 'bold'), bg='#C7DBB8')
     parentinfolabel.place(x=50, y=100)
     parentinfoentry = Entry(edit_addpetbackground, font=('Arial', 13, 'italic'), width=30)
@@ -233,48 +234,48 @@ def update_button():
                             font=('arial', 9, 'italic'), bg='#C7DBB8')
     p_i_instruction.place(x=200, y=129)
 
-    # 4
+    #4 UPDATE
     addresslabel = Label(edit_addpetbackground, text="Address                : ", font=('Arial', 12, 'bold'), bg='#C7DBB8')
     addresslabel.place(x=50, y=200)
     addressentry = Entry(edit_addpetbackground, font=('Arial', 13, 'italic'), width=30)
     addressentry.place(x=190, y=200)
 
-    # 3
+    #3 UPDATE
     contactnumlabel = Label(edit_addpetbackground, text="Contact Number : ", font=('Arial', 12, 'bold'), bg='#C7DBB8')
     contactnumlabel.place(x=50, y=150)
     contactnumentry = Entry(edit_addpetbackground, font=('Arial', 13, 'italic'), width=30)
     contactnumentry.place(x=190, y=150)
 
-    # 5
+    #5 UPDATE
     emaillabel = Label(edit_addpetbackground, text="E-mail Address   : ", font=('Arial', 12, 'bold'), bg='#C7DBB8')
     emaillabel.place(x=50, y=250)
     emailentry = Entry(edit_addpetbackground, font=('Arial', 13, 'italic'), width=30)
     emailentry.place(x=190, y=250)
 
-    # ================================================ PETS INFORMATION ===============================================
+    #UPDATE ================================================ PETS INFORMATION ===============================================
     petinformation = Label(edit_addpetFrame, text="Pet's Information", font=('Arial', 15, 'bold'), bg='#C7DBB8')
     petinformation.place(x=20, y=10)
-    # 1
+    #1 UPDATE
     petnamelabel = Label(edit_addpetFrame, text="Pet's Name          : ", font=('Arial', 12, 'bold'), bg='#C7DBB8')
     petnamelabel.place(x=50, y=50)
     petnameentry = Entry(edit_addpetFrame, font=('Arial', 13, 'italic'), width=30)
     petnameentry.place(x=190, y=50)
-    # 2
+    #2 UPDATE
     petagelabel = Label(edit_addpetFrame, text="Pet's Age              : ", font=('Arial', 12, 'bold'), bg='#C7DBB8')
     petagelabel.place(x=50, y=100)
     petageentry = Entry(edit_addpetFrame, font=('Arial', 13, 'italic'), width=30)
     petageentry.place(x=190, y=100)
-    # 3
+    #3 UPDATE
     petgenderlabel = Label(edit_addpetFrame, text="Pet's Gender       : ", font=('Arial', 12, 'bold'), bg='#C7DBB8')
     petgenderlabel.place(x=50, y=150)
     petgenderentry = Entry(edit_addpetFrame, font=('Arial', 13, 'italic'), width=30)
     petgenderentry.place(x=190, y=150)
-    # 4
+    #4 UPDATE
     breedlabel = Label(edit_addpetFrame, text="Pet's Breed          : ", font=('Arial', 12, 'bold'), bg='#C7DBB8')
     breedlabel.place(x=50, y=200)
     breedentry = Entry(edit_addpetFrame, font=('Arial', 13, 'italic'), width=30)
     breedentry.place(x=190, y=200)
-    # 5
+    #5 UPDATE
     specieslabel = Label(edit_addpetFrame, text="Pet's Species      : ", font=('Arial', 12, 'bold'), bg='#C7DBB8')
     specieslabel.place(x=50, y=250)
     speciesentry = Entry(edit_addpetFrame, font=('Arial', 12, 'italic'), width=30)
