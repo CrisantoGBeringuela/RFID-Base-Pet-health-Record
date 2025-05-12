@@ -1,8 +1,6 @@
 #MODULES
 import time
 import tkinter as tk
-from datetime import datetime
-from click import command
 from customtkinter import*
 from tkcalendar import Calendar
 from time import strftime
@@ -18,9 +16,11 @@ import pandas   #FOR CSV
 import customtkinter as ctk
 import shutil
 import io
+import serial
+import threading
 
-
-
+arduino_port = 'COM3 '
+baud_rate = 9600
 selected_binary_data = None
 
 
@@ -672,6 +672,33 @@ def addpetinfo():
                 label.image = img_tk
                 label.place(x=3, y=3)
 
+    def read_rfid_continuous():
+        try:
+            with serial.Serial(arduino_port, baud_rate, timeout=1) as ser:
+                rfidinfoentry.configure(state="normal")
+                rfidinfoentry.delete(0, ctk.END)
+                rfidinfoentry.insert(0, "Waiting for RFID card...")
+                rfidinfoentry.configure(state="readonly")
+
+                while True:
+                    if ser.in_waiting:
+                        rfid_data = ser.readline().decode('utf-8').strip()
+                        if rfid_data:
+                            rfidinfoentry.configure(state="normal")
+                            rfidinfoentry.delete(0, ctk.END)
+                            rfidinfoentry.insert(0, rfid_data)
+                            rfidinfoentry.configure(state="readonly")
+                            break  # Stop after reading once
+                    time.sleep(0.1)
+        except Exception as e:
+            rfidinfoentry.configure(state="normal")
+            rfidinfoentry.delete(0, ctk.END)
+            rfidinfoentry.insert(0, f"Error: {e}")
+            rfidinfoentry.configure(state="readonly")
+
+    # Start the RFID thread
+    def start_read_rfid_thread():
+        threading.Thread(target=read_rfid_continuous, daemon=True).start()
 
 
     #window for entering pet/owner's info
@@ -707,6 +734,10 @@ def addpetinfo():
     rfidinfolabel.place(x=50,y=50)
     rfidinfoentry = Entry(addpetbackground, font=('Arial', 13, 'italic'), width=30)
     rfidinfoentry.place(x=190,y=50)
+    rfidinfoentry.insert(0, "Scan RFID Card")
+    rfidinfoentry.configure(state="readonly")
+    read_button = CTkButton(addpetbackground, text = "Scan RFID",command=start_read_rfid_thread)
+    read_button.place(x=384,y=35)
     #2
     parentinfolabel = Label(addpetbackground, text="Parent's Name    : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
     parentinfolabel.place(x=50,y=100)
@@ -803,6 +834,34 @@ def add_petdiagnosis():
 
         except pymysql.Error as e:
             messagebox.showerror('Error', f"Error occurred: {e}", parent=addpet_window)
+    def read_rfid_continuous():
+        try:
+            with serial.Serial(arduino_port, baud_rate, timeout=1) as ser:
+                rfidinfoentry.configure(state="normal")
+                rfidinfoentry.delete(0, ctk.END)
+                rfidinfoentry.insert(0, "Waiting for RFID card...")
+                rfidinfoentry.configure(state="readonly")
+
+                while True:
+                    if ser.in_waiting:
+                        rfid_data = ser.readline().decode('utf-8').strip()
+                        if rfid_data:
+                            rfidinfoentry.configure(state="normal")
+                            rfidinfoentry.delete(0, ctk.END)
+                            rfidinfoentry.insert(0, rfid_data)
+                            rfidinfoentry.configure(state="readonly")
+                            break  # Stop after reading once
+                    time.sleep(0.1)
+        except Exception as e:
+            rfidinfoentry.configure(state="normal")
+            rfidinfoentry.delete(0, ctk.END)
+            rfidinfoentry.insert(0, f"Error: {e}")
+            rfidinfoentry.configure(state="readonly")
+
+    # Start the RFID thread
+    def start_read_rfid_thread():
+        threading.Thread(target=read_rfid_continuous, daemon=True).start()
+
 
     # Window for entering pet/owner's info
     addpet_window = CTkToplevel(window)
@@ -826,6 +885,10 @@ def add_petdiagnosis():
     rfidinfolabel.place(x=80,y=100)
     rfidinfoentry = CTkEntry(addpet_window, font=('Arial', 15, 'italic'), width=300)
     rfidinfoentry.place(x=85,y=135)
+    rfidinfoentry.insert(0, "Scan RFID Card")
+    rfidinfoentry.configure(state="readonly")
+    read_button = CTkButton(addpet_window, text="Scan RFID", command=start_read_rfid_thread)
+    read_button.place(x=384, y=35)
 
     diagnosislabel = CTkLabel(addpet_window, text="Remarks: ", font=('Arial', 15, 'bold'),fg_color='#C7DBB8')
     diagnosislabel.place(x=80,y=170)
@@ -1576,7 +1639,7 @@ event_description2 = CTkLabel(event_frame,text="Pet's Name (Species) - Reason of
 event_description2.place(x=10,y=75)
 
 
-event_entry =  CTkEntry(window, width=230,height=40,placeholder_text="Add Event or Meeting Here",bg_color='#C7DBB8')
+event_entry =  CTkEntry(window, width=230,height=40,placeholder_text="Add Appointment Here",bg_color='#C7DBB8')
 event_entry.place(x=922,y=570)
 
 # Add event button
