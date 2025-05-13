@@ -40,7 +40,7 @@ read_button = ctk.CTkButton(app, text="Read RFID Card", command=start_read_rfid_
 read_button.pack(pady=20)
 
 # Result Label
-result_label = ctk.CTkLabel(app, text="Click the button to scan an RFID card.", font=ctk.CTkFont(size=14))
+result_label = ctk.CTkEntry(app, placeholder_text="Click the button to scan an RFID card.", font=ctk.CTkFont(size=14))
 result_label.pack(pady=10)
 
 # Run App

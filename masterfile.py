@@ -534,7 +534,7 @@ def addpetinfo():
                 emailentry.get() == '' or
                 petnameentry.get() == '' or
                 petageentry.get() == '' or
-                petgenderentry.get() == '' or
+                petgenderentry.get() == 'Select an option' or
                 breedentry.get() == '' or
                 speciesentry.get() == ''):
             messagebox.showerror('Error', 'All fields are required', parent=addpet_window)
@@ -558,6 +558,7 @@ def addpetinfo():
                         petgenderentry.get(),
                         breedentry.get(),
                         speciesentry.get()
+
                     ))
                     con.commit()  # Commit changes to the database
                     result = messagebox.showinfo('Confirm', 'Data added successfully, Information added successfully', parent=addpet_window)
@@ -602,8 +603,8 @@ def addpetinfo():
                 # con.commit()
 
                 img = Image.open(file_path)
-                img = img.resize((248, 248))
-                img_tk = CTkImage(light_image=img, size=(248, 248))
+                img = img.resize((235, 238))
+                img_tk = CTkImage(light_image=img, size=(234, 234))
 
                 label = CTkLabel(petpictureFrame, image=img_tk, text="")
                 label.image = img_tk
@@ -618,87 +619,89 @@ def addpetinfo():
     addpet_window.resizable(False, False)
     addpet_window.grab_set()
 
-    addpet_BG = CTkImage(dark_image=Image.open('bg1.jpg'),size=(1440,800))
+    addpet_BG = CTkImage(dark_image=Image.open('bgsample.jpg'),size=(1440,490))
     addpet_BGLabel = CTkLabel(addpet_window,image=addpet_BG,text='')
     addpet_BGLabel.place(x=0,y=0)
     #for ownersFrame
-    addpetbackground = CTkFrame (addpet_window,fg_color='#C7DBB8',width= 530, height=340,border_width=2,border_color='green' )
-    addpetbackground.place(x=50,y=50)
+    #addpetbackground = CTkFrame (addpet_window,fg_color='#C7DBB8',width= 530, height=340,border_width=2,border_color='green' )
+    #addpetbackground.place(x=50,y=50)
     #for petFrame
-    addpetFrame = CTkFrame (addpet_window,fg_color='#C7DBB8',width= 790, height=340,border_width=2,border_color='green' )
-    addpetFrame.place(x=600,y=50)
+    #addpetFrame = CTkFrame (addpet_window,fg_color='#C7DBB8',width= 790, height=340,border_width=2,border_color='green' )
+    #addpetFrame.place(x=600,y=50)
     # ================================================ PICTURE IMPORT ===============================================
-    petpictureFrame = CTkFrame (addpetFrame,fg_color='white',width=255, height=255,border_color='green',border_width=2)
-    petpictureFrame.place(x=490,y=30)
+    petpictureFrame = CTkFrame (addpet_window,fg_color='white',width=240, height=240,border_color='black',border_width=2)
+    petpictureFrame.place(x=1080,y=130)
 
-    petpictureButton = CTkButton (addpetFrame,text='Add Photo',command=pet_uploadImage,font=("arial",16,'bold'),width=255,border_width=1,border_color='#1A5319',fg_color="#387478",hover_color='#729762')
-    petpictureButton.place(x=490,y=295)
+    petpictureButton = CTkButton (addpet_window,text='Add Photo',command=pet_uploadImage,font=("arial",16,'bold'),width=240,border_width=1,border_color='#1A5319',fg_color="#387478",hover_color='#729762')
+    petpictureButton.place(x=1080,y=380)
 
 
 #================================================ OWNERS INFORMATION ===============================================
-    parentinformation = Label (addpetbackground,text="Owner's Information",font=('Arial',15,'bold'),bg='#C7DBB8')
-    parentinformation.place(x=20,y=10)
+    #parentinformation = Label (addpet_window,text="Owner's Information",font=('Arial',15,'bold'),bg='#C7DBB8')
+    #parentinformation.place(x=20,y=10)
 
     #1
-    rfidinfolabel = Label(addpetbackground, text="RFID Number      : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
-    rfidinfolabel.place(x=50,y=50)
-    rfidinfoentry = Entry(addpetbackground, font=('Arial', 13, 'italic'), width=30)
-    rfidinfoentry.place(x=190,y=50)
+    #rfidinfolabel = Label(addpet_window, text="RFID Number      : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
+    #rfidinfolabel.place(x=50,y=50)
+    rfidinfoentry = CTkEntry(addpet_window, font=('Arial', 13, 'italic'), width=140,border_color='black')
+    rfidinfoentry.place(x=260,y=157)
     #2
-    parentinfolabel = Label(addpetbackground, text="Parent's Name    : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
-    parentinfolabel.place(x=50,y=100)
-    parentinfoentry = Entry(addpetbackground, font=('Arial', 13, 'italic'), width=30)
-    parentinfoentry.place(x=190,y=100)
-
-    p_i_instruction = Label(addpetbackground,text= "(  Surname , Given Name , Middle Initial  )",font=('arial',9,'italic'),bg='#C7DBB8')
-    p_i_instruction.place(x=200,y=129)
+    #parentinfolabel = Label(addpet_window, text="Parent's Name    : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
+    #parentinfolabel.place(x=50,y=100)
+    parentinfoentry = CTkEntry(addpet_window, font=('Arial', 13, 'italic'), width=250,border_color='black')
+    parentinfoentry.place(x=260,y=208)
+    # 3
+    # contactnumlabel = Label(addpet_window, text="Contact Number : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
+    # contactnumlabel.place(x=50,y=150)
+    contactnumentry = CTkEntry(addpet_window, font=('Arial', 13, 'italic'), width=250, border_color='black')
+    contactnumentry.place(x=260, y=260)
 
     #4
-    addresslabel = Label(addpetbackground, text="Address                : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
-    addresslabel.place(x=50,y=200)
-    addressentry = Entry(addpetbackground, font=('Arial', 13, 'italic'), width=30)
-    addressentry.place(x=190,y=200)
-    #3
-    contactnumlabel = Label(addpetbackground, text="Contact Number : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
-    contactnumlabel.place(x=50,y=150)
-    contactnumentry = Entry(addpetbackground, font=('Arial', 13, 'italic'), width=30)
-    contactnumentry.place(x=190,y=150)
+    #addresslabel = Label(addpet_window, text="Address                : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
+    #addresslabel.place(x=50,y=200)
+    addressentry = CTkEntry(addpet_window, font=('Arial', 13, 'italic'), width=250,border_color='black')
+    addressentry.place(x=260,y=311)
+
     #5
-    emaillabel = Label(addpetbackground, text="E-mail Address   : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
-    emaillabel.place(x=50,y=250)
-    emailentry = Entry(addpetbackground, font=('Arial', 13, 'italic'), width=30)
-    emailentry.place(x=190,y=250)
+    #emaillabel = Label(addpet_window, text="E-mail Address   : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
+    #emaillabel.place(x=50,y=250)
+    emailentry = CTkEntry(addpet_window, font=('Arial', 13, 'italic'), width=250,border_color='black')
+    emailentry.place(x=260,y=362)
 # ================================================ PETS INFORMATION ===============================================
-    petinformation = Label(addpetFrame, text="Pet's Information", font=('Arial', 15, 'bold'), bg='#C7DBB8')
-    petinformation.place(x=20, y=10)
+    #petinformation = Label(addpet_window, text="Pet's Information", font=('Arial', 15, 'bold'), bg='#C7DBB8')
+    #petinformation.place(x=20, y=10)
     #1
-    petnamelabel = Label(addpetFrame, text="Pet's Name          : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
-    petnamelabel.place(x=50,y=50)
-    petnameentry = Entry(addpetFrame, font=('Arial', 13, 'italic'), width=30)
-    petnameentry.place(x=190,y=50)
+    #petnamelabel = Label(addpet_window, text="Pet's Name          : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
+    #petnamelabel.place(x=50,y=50)
+    petnameentry = CTkEntry(addpet_window, font=('Arial', 13, 'italic'),width=250,border_color='black')
+    petnameentry.place(x=800,y=157)
     #2
-    petagelabel = Label(addpetFrame, text="Pet's Age              : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
-    petagelabel.place(x=50,y=100)
-    petageentry = Entry(addpetFrame, font=('Arial', 13, 'italic'), width=30)
-    petageentry.place(x=190,y=100)
+    #petagelabel = Label(addpet_window, text="Pet's Age              : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
+    #petagelabel.place(x=50,y=100)
+    petageentry = CTkEntry(addpet_window, font=('Arial', 13, 'italic'),width=250,border_color='black')
+    petageentry.place(x=800,y=208)
     #3
-    petgenderlabel = Label(addpetFrame, text="Pet's Gender       : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
-    petgenderlabel.place(x=50,y=150)
-    petgenderentry = Entry(addpetFrame, font=('Arial', 13, 'italic'), width=30)
-    petgenderentry.place(x=190,y=150)
+    #petgenderlabel = Label(addpet_window, text="Pet's Gender       : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
+    #petgenderlabel.place(x=50,y=150)
+    #petgenderentry = CTkEntry(addpet_window, font=('Arial', 13, 'italic'), width=150,border_color='black')
+    #petgenderentry.place(x=800,y=260)
+    genderChoices = ['Male', 'Female']
+    petgenderentry = ctk.CTkComboBox(addpet_window, values=genderChoices)
+    petgenderentry.place(x=800,y=260)
+    petgenderentry.set('Select an option')
     #4
-    breedlabel = Label(addpetFrame, text="Pet's Breed          : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
-    breedlabel.place(x=50,y=200)
-    breedentry = Entry(addpetFrame, font=('Arial', 13, 'italic'), width=30)
-    breedentry.place(x=190,y=200)
+    #breedlabel = Label(addpet_window, text="Pet's Breed          : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
+    #breedlabel.place(x=50,y=200)
+    breedentry = CTkEntry(addpet_window, font=('Arial', 13, 'italic'), width=250,border_color='black')
+    breedentry.place(x=800,y=311)
     #5
-    specieslabel = Label(addpetFrame, text="Pet's Species      : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
-    specieslabel.place(x=50,y=250)
-    speciesentry = Entry(addpetFrame, font=('Arial', 12, 'italic'), width=30)
-    speciesentry.place(x=190,y=250)
+    #specieslabel = Label(addpet_window, text="Pet's Species      : ", font=('Arial', 12, 'bold'),bg='#C7DBB8')
+    #specieslabel.place(x=50,y=250)
+    speciesentry = CTkEntry(addpet_window, font=('Arial', 12, 'italic'), width=250,border_color='black')
+    speciesentry.place(x=800,y=362)
 
-    submitbutton = CTkButton(addpet_window, text='Submit', command=add_data,width=250,height=45,font=("arial",16,'bold'),border_width=2,border_color='#1A5319',fg_color="#387478",hover_color='#729762')
-    submitbutton.place(x=1092,y=410)
+    submitbutton = CTkButton(addpet_window, text='Submit', command=add_data,width=240,height=45,font=("arial",16,'bold'),border_width=2,border_color='#1A5319',fg_color="#387478",hover_color='#729762')
+    submitbutton.place(x=1080,y=428)
 
 #def calendarboard():
  #   window.destroy()
@@ -781,6 +784,21 @@ def add_petdiagnosis():
     submitbutton.place(x=125,y=380)
 
 
+def inventory_section():
+    InventoryLevel = CTkToplevel(window)
+    InventoryLevel.geometry('1000x900+300+150')
+    InventoryLevel.title("STOCK ORDERING")
+    InventoryLevel.resizable(False, False)
+    InventoryLevel.grab_set()
+
+    addpet_BG = CTkImage(dark_image=Image.open('bg2.jpg'), size=(1440, 900))
+    addpet_BGLabel = CTkLabel(InventoryLevel, image=addpet_BG, text='')
+    addpet_BGLabel.place(x=0, y=0)
+
+    inventoryFrame = CTkFrame(InventoryLevel,width=600,height=500, border_color='#6A9C89', border_width=4,fg_color='#C7DBB8')
+    inventoryFrame.place(x=0,y=0)
+
+
 #------------------------------------------------------------------------------------------------------------------
 #DATABASE (FUNCTION)
 def connect_database():
@@ -816,6 +834,7 @@ def connect_database():
         updatebutton.configure(state=NORMAL)
         addstaffinfo.configure(state=NORMAL)
         staffinfo.configure(state=NORMAL)
+        inventoryrecord.configure(state=NORMAL)
 
     connectwindow = CTkToplevel(window)
     connectwindow.geometry('390x350+730+230')
@@ -1180,6 +1199,7 @@ def view_employeeRecord():
 
 
 
+
     employeeRecord = CTkToplevel(window)
     employeeRecord.geometry('1000x480+300+150')
     employeeRecord.title("EMPLOYEE RECORD")
@@ -1372,7 +1392,7 @@ inventorypic = CTkImage(light_image=Image.open('inventory.png'),size = (35,35))
 inventorytext=CTkLabel(window,text=" INVENTORY SECTION",fg_color='#C1D8C3',image=inventorypic,compound='left',font=('times new roman',17,'bold'),text_color='#1A5319')
 inventorytext.place(x=0,y=474)
 
-inventoryrecord=CTkButton(window,text='Inventory Records',state=DISABLED,width=250,height=45,corner_radius=0,font=("arial",14,'bold'),border_width=2,border_color='#1A5319',fg_color="#387478",hover_color='#729762')
+inventoryrecord=CTkButton(window,text='Inventory Records',command=inventory_section,state=DISABLED,width=250,height=45,corner_radius=0,font=("arial",14,'bold'),border_width=2,border_color='#1A5319',fg_color="#387478",hover_color='#729762')
 inventoryrecord.place(x=0,y=515)
 #------------------------------------------------------------------------------------------------------------------
 
