@@ -749,39 +749,35 @@ def add_petdiagnosis():
     addpet_window.title("ADD PET/OWNER'S INFORMATION")
     addpet_window.resizable(False, False)
     addpet_window.grab_set()
-    addpet_window.geometry('470x500+50+50')
+    addpet_window.geometry('870x400+80+80')
 
 
 
-    addpetBG = CTkImage(dark_image=Image.open('bg2.jpg'), size=(750, 750))
+    addpetBG = CTkImage(dark_image=Image.open('rfidremarks.jpg'), size=(900, 400))
     addpetBGlabel = CTkLabel(addpet_window, image=addpetBG, text='')
     addpetBGlabel.place(x=0, y=0)
 
-    addpetframe = CTkFrame(addpet_window, width=370, height=300, border_color='#6A9C89', border_width=4,fg_color='#C7DBB8')
-    addpetframe.place(x=50, y=62)
+    #addpetframe = CTkFrame(addpet_window, width=370, height=300, border_color='#6A9C89', border_width=4,fg_color='#C7DBB8')
+    #addpetframe.place(x=50, y=62)
 
 
     # Entry fields for RFID and Diagnosis
-    rfidinfolabel = CTkLabel(addpet_window, text="RFID Number: ", font=('Arial', 15, 'bold'),fg_color='#C7DBB8')
-    rfidinfolabel.place(x=80,y=100)
-    rfidinfoentry = CTkEntry(addpet_window, font=('Arial', 15, 'italic'), width=300)
-    rfidinfoentry.place(x=85,y=135)
+    #rfidinfolabel = CTkLabel(addpet_window, text="RFID Number: ", font=('Arial', 15, 'bold'),fg_color='#C7DBB8')
+    #rfidinfolabel.place(x=80,y=100)
+    rfidinfoentry = CTkEntry(addpet_window, font=('Arial', 15, 'italic'), width=150,border_color='black')
+    rfidinfoentry.place(x=548,y=89)
 
-    diagnosislabel = CTkLabel(addpet_window, text="Remarks: ", font=('Arial', 15, 'bold'),fg_color='#C7DBB8')
-    diagnosislabel.place(x=80,y=170)
-    diagnosisentry = CTkTextbox(addpet_window, font=('Arial', 12, 'italic'), width=300,height=90)
-    diagnosisentry.place(x=85,y=200)
+    #diagnosislabel = CTkLabel(addpet_window, text="Remarks: ", font=('Arial', 15, 'bold'),fg_color='#C7DBB8')
+    #diagnosislabel.place(x=80,y=170)
+    diagnosisentry = CTkTextbox(addpet_window, font=('Arial', 12, 'italic'), width=337,height=142,border_color='black',border_width=2)
+    diagnosisentry.place(x=435,y=171)
 
 
-    remarks_one= CTkLabel(addpet_window, text= 'Put the exact diagnosis or remarks for the patient (pet)',font=('Arial',12,'italic'),fg_color='#C7DBB8')
-    remarks_one.place(x=85,y=295)
-    remarks_one = CTkLabel(addpet_window, text='(Example for; Vaccine, deworm, Capon, etc.;)',font=('Arial', 12, 'italic'), fg_color='#C7DBB8')
-    remarks_one.place(x=85, y=315)
 
     submitbutton = CTkButton(addpet_window,text='SUBMIT', font=("Arial", 16, 'bold'), compound='right',
                              text_color='#FFEAC5', corner_radius=10, hover_color='#83c7ac', fg_color='#16423C',
                              border_color='#16423C', border_width=1, width=200, height=40,command=add_data)
-    submitbutton.place(x=125,y=380)
+    submitbutton.place(x=600,y=345)
 
 
 def inventory_section():
