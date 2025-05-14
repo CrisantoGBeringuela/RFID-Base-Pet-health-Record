@@ -13,7 +13,7 @@ import mysql.connector
 from mysql.connector import Error
 from datetime import datetime
 from customtkinter import CTkButton, CTkFrame, CTkImage
-from PIL import Image,ImageTk #to support jpeg format
+from PIL import Image, ImageDraw, ImageOps,ImageTk #to support jpeg format
 import pandas   #FOR CSV
 import customtkinter as ctk
 import shutil
@@ -332,45 +332,96 @@ def show_pet_details():
                 # Create the details window
                 details_window = CTkToplevel(window)
                 details_window.title("Pet/Owner Details")
-                details_window.geometry('1170x650')
+                details_window.geometry('1300x650')
                 details_window.resizable(False, False)
                 details_window.grab_set()
 
-                details_windowBG = CTkImage(dark_image=Image.open('bg1.jpg'), size=(1170, 650))
+                details_windowBG = CTkImage(dark_image=Image.open('petdetails.jpg'), size=(1400, 650))
                 details_windowBGLabel = CTkLabel(details_window, image=details_windowBG, text='')
                 details_windowBGLabel.place(x=0, y=0)
 
-                mainframe = CTkFrame(details_window, width=1070, height=600, border_color='#6A9C89', border_width=2,
-                                     fg_color='#C7DBB8')
-                mainframe.place(x=45, y=10)
+                # Create circular version of the image
+                def create_circle_image(image_data, size=(200, 200)):
+                    img = Image.open(io.BytesIO(image_data)).convert("RGBA")
+                    img = img.resize(size, Image.Resampling.LANCZOS)
 
-                details_windowFrame = CTkFrame(details_window, width=900, height=700, border_color='#C7DBB8',
-                                               border_width=2, fg_color='#C7DBB8')
-                details_windowFrame.place(x=50, y=15)
+                    # Create a mask for the circle
+                    mask = Image.new("L", size, 0)
+                    draw = ImageDraw.Draw(mask)
+                    draw.ellipse((0, 0) + size, fill=255)
 
-                # Initialize the viewPetPicture frame before using it
-                viewPetPicture = CTkFrame(mainframe, width=350, height=350, fg_color='white', border_width=2,
-                                          border_color='green')
-                viewPetPicture.place(x=700, y=10)
+                    # Apply mask to the image
+                    circular_img = ImageOps.fit(img, size, centering=(0.5, 0.5))
+                    circular_img.putalpha(mask)
 
-                # Now you can place the image inside the frame
-                label = CTkLabel(viewPetPicture, image=img_tk, text='')  # Use the frame here
-                label.image = img_tk  # Keep reference to avoid garbage collection
+                    return circular_img
+
+                # Load and process the image
+                if result:
+                    selected_binary_data = result[0]
+                    circular_image = create_circle_image(selected_binary_data)
+                    img_tk = CTkImage(light_image=circular_image, size=(186, 186))
+
+                #mainframe = CTkFrame(details_window, width=1070, height=600, border_color='#6A9C89', border_width=2,fg_color='#C7DBB8')
+                #mainframe.place(x=45, y=10)
+
+                #details_windowFrame = CTkFrame(details_window, width=900, height=700, border_color='#C7DBB8',
+                                               #border_width=2, fg_color='#C7DBB8')
+                #details_windowFrame.place(x=50, y=15)
+
+                 #Initialize the viewPetPicture frame before using it
+                viewPetPicture = CTkFrame(details_window, width=186, height=186, fg_color='white', border_width=0)
+                viewPetPicture.place(x=36, y=247)
+
+                label = CTkLabel(viewPetPicture, image=img_tk, text='')
+                label.image = img_tk
                 label.place(x=0, y=0)
 
-                labels = ['I.D', 'RFID Number', 'Name', 'Address', 'Contact Number', 'Email address',
-                          "Pet's Name", "Pet's Age", "Pet's Gender", 'Breed', 'Species']
 
-                # Display pet details in the new window
-                for i, value in enumerate(values):
-                    if i < len(labels):
-                        title_label = CTkLabel(details_windowFrame, text=f"{labels[i]}:", font=('Arial', 20, 'bold'),
-                                               text_color='#557C56', fg_color='transparent')
-                        title_label.grid(row=i, column=0, sticky="w", padx=10, pady=5)
+                # Destructure values for easier acces
 
-                        value_label = CTkLabel(details_windowFrame, text=value, font=('Arial', 18, 'italic'),
-                                               text_color='Black')
-                        value_label.grid(row=i, column=1, sticky="w", padx=15, pady=5)
+
+                # Unpack values
+                (
+                    id, rfid, name, address, contact, email, petname,
+                    pet_age, pet_gender, breed, species
+                ) = values
+
+                # Function to wrap address text every 5 words
+                def wrap_address(text, max_words=5):
+                    words = text.split()
+                    return '\n'.join(' '.join(words[i:i + max_words]) for i in range(0, len(words), max_words))
+
+                # --- PET INFO SECTION ---
+                #CTkLabel(details_window, text="RFID Number:", font=('Fredoka', 20, 'bold'),text_color='#557C56').place(x=50, y=30)
+                CTkLabel(details_window, text=rfid, font=('Fredoka', 14,'bold'),text_color='#54321A',bg_color='white').place(x=315, y=312)
+
+                #CTkLabel(details_window, text="Pet's Name:", font=('Fredoka', 20, 'bold'),text_color='#557C56').place(x=50, y=70)
+                CTkLabel(details_window, text=petname, font=('Fredoka', 43, 'bold','italic'),text_color='#54321A',bg_color='white').place(x=310, y=230)
+
+                #CTkLabel(details_window, text="Pet's Age:", font=('Fredoka', 20, 'bold'),text_color='#557C56').place(x=50, y=110)
+                CTkLabel(details_window, text=pet_age,  font=('Fredoka', 14,'bold'),text_color='#54321A',bg_color='white').place(x=315, y=335)
+
+                #CTkLabel(details_window, text="Breed:", font=('Fredoka', 20, 'bold'),text_color='#557C56').place(x=50, y=150)
+                CTkLabel(details_window, text=breed, font=('Fredoka', 14,'bold'),text_color='#54321A',bg_color='white').place(x=315, y=356)
+
+                #CTkLabel(details_window, text="Species:", font=('Fredoka', 20, 'bold'),text_color='#557C56').place(x=50, y=190)
+                CTkLabel(details_window, text=species, font=('Fredoka', 14,'bold'),text_color='#54321A',bg_color='white').place(x=315, y=383)
+
+                # --- OWNER INFO SECTION ---
+                #CTkLabel(details_window, text="Owner Information", font=('Fredoka', 22, 'bold'),text_color='#387478').place(x=50, y=240)
+
+                #CTkLabel(details_window, text="Name:", font=('Fredoka', 20, 'bold'),text_color='#557C56').place(x=50, y=280)
+                CTkLabel(details_window, text=name, font=('Fredoka', 14,'bold'),text_color='#54321A',bg_color='white').place(x=525, y=300)
+
+                #CTkLabel(details_window, text="Address:", font=('Fredoka', 20, 'bold'),text_color='#557C56').place(x=50, y=320)
+                CTkLabel(details_window, text=wrap_address(address),font=('Fredoka', 14,'bold'),text_color='#54321A',bg_color='white').place(x=525, y=388)
+
+                #CTkLabel(details_window, text="Contact Number:", font=('Fredoka', 20, 'bold'),text_color='#557C56').place(x=50, y=400)
+                CTkLabel(details_window, text=contact, font=('Fredoka', 14,'bold'),text_color='#54321A',bg_color='white').place(x=525, y=330)
+
+                #CTkLabel(details_window, text="Email Address:", font=('Fredoka', 20, 'bold'),text_color='#557C56').place(x=50, y=440)
+                CTkLabel(details_window, text=email, font=('Fredoka', 14,'bold'),text_color='#54321A',bg_color='white').place(x=525, y=356)
 
                 def fetch_data():
                     query = 'SELECT * FROM tb_diagdate'
@@ -404,7 +455,7 @@ def show_pet_details():
 
                 # Scrollable table for diagnosis history
                 diagnosis_frame = CTkFrame(details_window, width=80, height=15)
-                diagnosis_frame.place(x=680, y=200)
+                diagnosis_frame.place(x=835, y=210)
 
                 diagnosis_table_frame = Frame(diagnosis_frame)
                 diagnosis_table_frame.grid(row=1, column=0, columnspan=2)
