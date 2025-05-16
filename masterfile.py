@@ -1,7 +1,8 @@
 #MODULES
 import time
 import tkinter as tk
-
+from tkinter import ttk
+from ttkthemes import ThemedStyle
 from click import command
 from customtkinter import*
 from tkcalendar import Calendar
@@ -31,6 +32,9 @@ window.geometry('1510x694+80+80')
 window.resizable(False,False)
 window.title('ADMINISTRATOR')
 set_appearance_mode("light")
+
+style = ThemedStyle(window)
+style.set_theme("breeze")
 #------------------------------------------------------------------------------------------------------------------
 #database for calendar
 def connect_db():
@@ -379,8 +383,6 @@ def show_pet_details():
 
 
                 # Destructure values for easier acces
-
-
                 # Unpack values
                 (
                     id, rfid, name, address, contact, email, petname,
@@ -494,16 +496,21 @@ def show_pet_details():
                         if diag_values:
                             full_diagnosis_window = CTkToplevel(details_window)
                             full_diagnosis_window.title("Full Diagnosis Details")
-                            full_diagnosis_window.geometry('500x300')
+                            full_diagnosis_window.geometry('500x300+400+300')
                             full_diagnosis_window.grab_set()
 
-                            date_label = CTkLabel(full_diagnosis_window, text=f"Date: {diag_values[0]}",
-                                                  font=('Arial', 18, 'bold'), text_color='Red')
-                            date_label.pack(pady=10)
+                            full_diagnosis_window_image = CTkImage(dark_image=Image.open(r'masterfilepicture\remarks&diagnosis.jpg'), size=(500, 300))
+                            full_diagnosis_windowLabel = CTkLabel(full_diagnosis_window, image=full_diagnosis_window_image, text='')
+                            full_diagnosis_windowLabel.place(x=0, y=0)
 
-                            diagnosis_label = CTkLabel(full_diagnosis_window, text=f"Diagnosis: {diag_values[1]}",
-                                                       font=('Arial', 18, 'italic'), text_color='Black', wraplength=450)
-                            diagnosis_label.pack(pady=10)
+
+                            date_label = CTkLabel(full_diagnosis_window, text=f"{diag_values[1]}",
+                                                  font=('Arial', 18, 'bold'), text_color='Red',fg_color='#ffffe3')
+                            date_label.place(x=112,y=85)
+
+                            diagnosis_label = CTkLabel(full_diagnosis_window, text=f"{diag_values[2]}",
+                                                       font=('Arial', 12, 'italic'), text_color='Black', wraplength=300,fg_color='#ffffe3')
+                            diagnosis_label.place(x=112,y=145)
 
                 diagnosis_table.bind("<Double-1>", on_double_click)
 
@@ -995,84 +1002,83 @@ def addnewEmployee():
             messagebox.showerror('Error', f'Failed to save employee data.\n{e}', parent=addnewEmployee)
 
     addnewEmployee = CTkToplevel(window)
-    addnewEmployee.geometry('750x750+300+150')
+    addnewEmployee.geometry('750x700+300+150')
     addnewEmployee.title("EMPLOYEE INFORMATION")
     addnewEmployee.resizable(False, False)
     addnewEmployee.grab_set()
 
-    employeeBG = CTkImage(dark_image=Image.open('bg2.jpg'), size=(750, 750))
+    employeeBG = CTkImage(dark_image=Image.open(r'employeestaff\employeeBG.jpg'), size=(750, 750))
     employeeBGlabel = CTkLabel(addnewEmployee, image=employeeBG, text='')
     employeeBGlabel.place(x=0, y=0)
 
-    employeeframe = CTkFrame(addnewEmployee, width=600, height=640, border_color='#6A9C89', border_width=4, fg_color='#C7DBB8')
-    employeeframe.place(x=70, y=30)
+
 
     # FULL NAME
-    fullnamelabel = CTkLabel(employeeframe, text="Name : ", font=('Arial', 18, 'bold', 'italic'))
-    fullnamelabel.place(x=65, y=30)
-    fullnameentry = CTkEntry(employeeframe, font=('Arial', 15), width=280, corner_radius=12)
-    fullnameentry.place(x=80, y=60)
-    username = CTkLabel(employeeframe, text="( Surname, Full Name, M.I )", font=('Arial', 11, 'italic'))
-    username.place(x=95, y=90)
+    #fullnamelabel = CTkLabel(addnewEmployee, text="Name : ", font=('Arial', 18, 'bold', 'italic'))
+    #fullnamelabel.place(x=65, y=30)
+    fullnameentry = CTkEntry(addnewEmployee, font=('Arial', 15), width=300,bg_color='white',height=28,corner_radius=-1,border_color='black')
+    fullnameentry.place(x=28, y=135)
+    #username = CTkLabel(addnewEmployee, text="( Surname, Full Name, M.I )", font=('Arial', 11, 'italic'),bg_color='white')
+    #username.place(x=95, y=90)
 
     # AGE
-    agelabel = CTkLabel(employeeframe, text="Age : ", font=('Arial', 18, 'bold', 'italic'))
-    agelabel.place(x=380, y=30)
-    ageentry = CTkEntry(employeeframe, font=('Arial', 15), width=140, corner_radius=12)
-    ageentry.place(x=390, y=60)
+    #agelabel = CTkLabel(addnewEmployee, text="Age : ", font=('Arial', 18, 'bold', 'italic'))
+    #agelabel.place(x=380, y=30)
+    ageentry = CTkEntry(addnewEmployee, font=('Arial', 15), width=140,bg_color='white',height=28,corner_radius=-1,border_color='black')
+    ageentry.place(x=417, y=272)
 
     # ADDRESS
-    addresslabel = CTkLabel(employeeframe, text="Full Address : ", font=('Arial', 18, 'bold', 'italic'))
-    addresslabel.place(x=65, y=120)
-    addressentry = CTkEntry(employeeframe, font=('Arial', 15), width=450, corner_radius=12)
-    addressentry.place(x=80, y=150)
-    addressNote = CTkLabel(employeeframe, text="(Lot/Block, Street, Subdivision, Barangay, City, Province)", font=('Arial', 11, 'italic'))
-    addressNote.place(x=95, y=180)
+    #addresslabel = CTkLabel(addnewEmployee, text="Full Address : ", font=('Arial', 18, 'bold', 'italic'))
+    #addresslabel.place(x=65, y=120)
+    addressentry = CTkEntry(addnewEmployee, font=('Arial', 15), width=528,bg_color='white',height=28,corner_radius=-1,border_color='black')
+    addressentry.place(x=28, y=201)
+    #addressNote = CTkLabel(addnewEmployee, text="(Lot/Block, Street, Subdivision, Barangay, City, Province)", font=('Arial', 11, 'italic'))
+    #addressNote.place(x=95, y=180)
 
     # PHONE NUMBER
-    phonenumberlabel = CTkLabel(employeeframe, text="Phone Number : ", font=('Arial', 18, 'bold', 'italic'))
-    phonenumberlabel.place(x=65, y=210)
-    phonenumberentry = CTkEntry(employeeframe, font=('Arial', 15), width=250, corner_radius=12, placeholder_text="09XX-XXX-XXXX")
-    phonenumberentry.place(x=80, y=240)
+    #phonenumberlabel = CTkLabel(addnewEmployee, text="Phone Number : ", font=('Arial', 18, 'bold', 'italic'))
+    #phonenumberlabel.place(x=65, y=210)
+    phonenumberentry = CTkEntry(addnewEmployee, font=('Arial', 15), width=250, placeholder_text="09XX-XXX-XXXX",bg_color='white',height=28,corner_radius=-1,border_color='black')
+    phonenumberentry.place(x=28, y=272)
 
     # GENDER
-    genderlabel = CTkLabel(employeeframe, text="Gender: ", font=('Arial', 18, 'bold', 'italic'))
-    genderlabel.place(x=380, y=210)
+    #genderlabel = CTkLabel(addnewEmployee, text="Gender: ", font=('Arial', 18, 'bold', 'italic'))
+    #genderlabel.place(x=380, y=210)
     genderChoices = ['Male', 'Female']
-    dropdownGender = ctk.CTkComboBox(employeeframe, values=genderChoices)
-    dropdownGender.place(x=390, y=240)
+    dropdownGender = ctk.CTkComboBox(addnewEmployee, values=genderChoices,bg_color='white',height=28,corner_radius=-1,border_color='black')
+    dropdownGender.place(x=417, y=340)
     dropdownGender.set('Select an option')
 
     # TIN
-    TINlabel = CTkLabel(employeeframe, text="TIN Number : ", font=('Arial', 18, 'bold', 'italic'))
-    TINlabel.place(x=65, y=270)
-    TINentry = CTkEntry(employeeframe, font=('Arial', 15), width=250, corner_radius=12, placeholder_text="XXX-XXX-XXX")
-    TINentry.place(x=80, y=300)
+    #TINlabel = CTkLabel(addnewEmployee, text="TIN Number : ", font=('Arial', 18, 'bold', 'italic'))
+    #TINlabel.place(x=65, y=270)
+    TINentry = CTkEntry(addnewEmployee, font=('Arial', 15), width=250,bg_color='white',height=28,corner_radius=-1,border_color='black', placeholder_text="XXX-XXX-XXX")
+    TINentry.place(x=28, y=340)
 
     # SSS
-    SSSlabel = CTkLabel(employeeframe, text="SSS Number : ", font=('Arial', 18, 'bold', 'italic'))
-    SSSlabel.place(x=65, y=330)
-    SSSentry = CTkEntry(employeeframe, font=('Arial', 15), width=250, corner_radius=12, placeholder_text="XX-XXXXXXX-X")
-    SSSentry.place(x=80, y=360)
+    #SSSlabel = CTkLabel(addnewEmployee, text="SSS Number : ", font=('Arial', 18, 'bold', 'italic'))
+    #SSSlabel.place(x=65, y=330)
+    SSSentry = CTkEntry(addnewEmployee, font=('Arial', 15), width=250,bg_color='white',height=28,corner_radius=-1,border_color='black', placeholder_text="XX-XXXXXXX-X")
+    SSSentry.place(x=28, y=409)
 
     # PAG-IBIG
-    PAG_IBIGlabel = CTkLabel(employeeframe, text="PAG-IBIG Number : ", font=('Arial', 18, 'bold', 'italic'))
-    PAG_IBIGlabel.place(x=65, y=390)
-    PAG_IBIGentry = CTkEntry(employeeframe, font=('Arial', 15), width=250, corner_radius=12, placeholder_text="XXXXXXXXXXXX")
-    PAG_IBIGentry.place(x=80, y=420)
+    #PAG_IBIGlabel = CTkLabel(addnewEmployee, text="PAG-IBIG Number : ", font=('Arial', 18, 'bold', 'italic'))
+    #PAG_IBIGlabel.place(x=65, y=390)
+    PAG_IBIGentry = CTkEntry(addnewEmployee, font=('Arial', 15), width=250,bg_color='white',height=28,corner_radius=-1,border_color='black', placeholder_text="XXXXXXXXXXXX")
+    PAG_IBIGentry.place(x=28, y=477)
 
     # BIRTHDATE
-    birthdatelabel = CTkLabel(employeeframe, text="Birthday : ", font=('Arial', 18, 'bold', 'italic'))
-    birthdatelabel.place(x=380, y=270)
-    birthdateentry = CTkEntry(employeeframe, font=('Arial', 15), width=140, corner_radius=12, placeholder_text="MM/DD/YYYY")
-    birthdateentry.place(x=390, y=300)
+    #birthdatelabel = CTkLabel(addnewEmployee, text="Birthday : ", font=('Arial', 18, 'bold', 'italic'))
+    #birthdatelabel.place(x=380, y=270)
+    birthdateentry = CTkEntry(addnewEmployee, font=('Arial', 15), width=140,bg_color='white',height=28,corner_radius=-1,border_color='black', placeholder_text="MM/DD/YYYY")
+    birthdateentry.place(x=417, y=409)
 
 
     # SUBMIT BUTTON
-    SubmitButton = CTkButton(employeeframe, text='SUBMIT', font=("Arial", 20, 'bold'), compound='right',
-                             text_color='#FFEAC5', corner_radius=10, hover_color='#83c7ac', fg_color='#16423C',
-                             border_color='#16423C', border_width=1, width=270, height=60,command=Submit)
-    SubmitButton.place(x=170, y=490)
+    SubmitButton = CTkButton(addnewEmployee, text='SUBMIT', font=("Arial", 15, 'bold'), compound='right',
+                             text_color='black', corner_radius=-1, hover_color='#83c7ac', fg_color='#faf3cd',
+                             border_color='#16423C', border_width=1, width=180, height=50,command=Submit)
+    SubmitButton.place(x=417, y=465)
 #------------------------------------------------------------------------------------------------------------------
 #VIEW EMPLOYEE (FUNCTION)
 def view_employeeRecord():
@@ -1355,15 +1361,15 @@ clock()
 #MAIN WINDOW
 #slider
 style = ttk.Style()
-style.theme_use("default")
-style.configure('Treeview.Heading',background='#557C56',foreground='#F4F6FF',font=('Times new roman',14,'bold'))
+style.theme_use("breeze")
+#style.configure('Treeview.Heading',background='#557C56',foreground='black',font=('Times new roman',14,'bold'))
 style.map('Treeview.Heading',background=[('active','#6A9C89')])
-style.configure("Treeview",background='#C7DBB8',  #background sa treeview#foreground='white', #text color
+style.configure("Treeview",background='white',  #background sa treeview#foreground='white', #text color
                 rowheight=30, #nipis
-                fieldbackground='#C7DBB8',
+                fieldbackground='black',
                 fontstyle=('times new roman',35)
                 )
-style.map('Treeview',background=[('selected','green')]) #selected row
+style.map('Treeview',background=[('selected','#387478')]) #selected row
 
 treeviewframe = Frame(window)
 treeviewframe.place(x=255, y=100, width=720, height=500)
