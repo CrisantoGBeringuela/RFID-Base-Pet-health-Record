@@ -839,18 +839,167 @@ def add_petdiagnosis():
 
 
 def inventory_section():
-    InventoryLevel = CTkToplevel(window)
-    InventoryLevel.geometry('1000x900+300+150')
-    InventoryLevel.title("STOCK ORDERING")
-    InventoryLevel.resizable(False, False)
-    InventoryLevel.grab_set()
+    def register_stock():
+        # Get data from the entry widgets
+        inventory_id = InventoryID.get()
+        stock_name = StockName.get()
+        item_description = description.get()
+        unit_price = unitprice.get()
+        reorder_level = reorderlevel.get()
+        quantity = levelqty.get()
 
-    addpet_BG = CTkImage(dark_image=Image.open('bg2.jpg'), size=(1440, 900))
-    addpet_BGLabel = CTkLabel(InventoryLevel, image=addpet_BG, text='')
-    addpet_BGLabel.place(x=0, y=0)
+        # Validate inputs
+        if not inventory_id or not stock_name or not item_description or not unit_price or not reorder_level or not quantity:
+            messagebox.showwarning("Input Error", "Please fill in all fields.",parent=inventoryRecord)
+            return
 
-    inventoryFrame = CTkFrame(InventoryLevel,width=600,height=500, border_color='#6A9C89', border_width=4,fg_color='#C7DBB8')
-    inventoryFrame.place(x=0,y=0)
+        try:
+            # Convert inputs to the correct types
+            inventory_id = int(inventory_id)
+            unit_price = int(unit_price)
+            reorder_level = int(reorder_level)
+            quantity = int(quantity)
+
+        except ValueError:
+            messagebox.showwarning("Input Error",
+                                   "Please enter valid numeric values for inventory ID, unit price, reorder level, and quantity.",parent=inventoryRecord)
+            return
+
+        cursor = conn.cursor()
+        insert_query = """
+                INSERT INTO tb_stockordering (InventoryID, ItemName, Description, Unit_Price, reorderlevel, qty)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                """
+
+        # Execute the query with data
+        cursor.execute(insert_query, (inventory_id, stock_name, item_description, unit_price, reorder_level, quantity))
+
+        # Commit the changes to the database
+        conn.commit()
+
+        # Provide feedback to the user
+        messagebox.showinfo("Success", "Stock item registered successfully!",parent=inventoryRecord)
+
+        # Clear the entry fields after successful registration
+        InventoryID.delete(0, 'end')
+        StockName.delete(0, 'end')
+        description.delete(0, 'end')
+        unitprice.delete(0, 'end')
+        reorderlevel.delete(0, 'end')
+        levelqty.delete(0, 'end')
+
+        # Close the cursor
+        cursor.close()
+
+        # Fetch and display the updated data
+        fetch_data()
+
+    def fetch_data():
+        cursor = conn.cursor()
+        try:
+            # Use the correct database
+            cursor.execute("USE vetclinicmanagementsystemnew;")
+
+            # Fetch all rows from the table
+            cursor.execute("SELECT * FROM tb_stockordering")
+            rows = cursor.fetchall()
+
+            # Clear existing rows in the treeview
+            for item in header.get_children():
+                header.delete(item)
+
+            # Insert the fetched rows into the treeview
+            for row in rows:
+                header.insert('', 'end', values=row)
+        except mysql.connector.Error as err:
+            messagebox.showerror("Database Error", f"Error: {err}")
+        finally:
+            cursor.close()
+
+    # Create a new window for the inventory section
+    inventoryRecord = CTkToplevel(window)
+    inventoryRecord.geometry('1100x830+300+150')
+    inventoryRecord.title("INVENTORY LIST")
+    inventoryRecord.resizable(False, False)
+    inventoryRecord.grab_set()
+
+    # Background image for the window
+    view_inventory = CTkImage(dark_image=Image.open(r'masterfilepicture\stockordering.jpg'), size=(1100, 900))
+    view_inventorylabel = CTkLabel(inventoryRecord, image=view_inventory, text='')
+    view_inventorylabel.place(x=0, y=0)
+
+    # Entry widgets for stock details
+    InventoryID = CTkEntry(inventoryRecord, width=180, bg_color='white', height=24, corner_radius=-1, border_color='#cbcbcb')
+    InventoryID.place(x=60, y=216)
+
+    StockName = CTkEntry(inventoryRecord, width=200, bg_color='white', height=24, corner_radius=-1, border_color='#cbcbcb')
+    StockName.place(x=60, y=270)
+
+    description = CTkEntry(inventoryRecord, width=330, bg_color='white', height=24, corner_radius=-1, border_color='#cbcbcb')
+    description.place(x=60, y=324)
+
+    unitprice = CTkEntry(inventoryRecord, width=120, bg_color='white', height=24, corner_radius=-1, border_color='#cbcbcb')
+    unitprice.place(x=60, y=378)
+
+    reorderlevel = CTkEntry(inventoryRecord, width=120, bg_color='white', height=24, corner_radius=-1, border_color='#cbcbcb')
+    reorderlevel.place(x=60, y=475)
+
+    levelqty = CTkEntry(inventoryRecord, width=120, bg_color='white', height=24, corner_radius=-1, border_color='#cbcbcb')
+    levelqty.place(x=243, y=475)
+
+    # Register Button
+    registerbutton = CTkButton(inventoryRecord, text="REGISTER", command=register_stock, width=200,
+                               height=60, font=("arial", 14, 'bold'), border_width=2, border_color='white',
+                               fg_color="#f2b62a", hover_color='#729762', bg_color='#303030', text_color='black')
+    registerbutton.place(x=200, y=550)
+
+    # Frame for inventory display
+    inventoryframe = CTkFrame(inventoryRecord, width=400, height=800, border_color='#4DA1A9', border_width=4, fg_color="#B3C8CF")
+    inventoryframe.place(x=450, y=170)
+
+    inv_treeviewframe = Frame(inventoryframe)
+    inv_treeviewframe.pack(fill=BOTH, expand=1)
+    inv_treeviewframe.place(x=0, y=0, width=500, height=800)
+    scrollbarY = Scrollbar(inventoryframe, orient='vertical')
+
+    # Treeview widget to display inventory
+    header = ttk.Treeview(inventoryframe,
+                          columns=('id', 'InventoryID', 'ItemName', 'Description', 'Unit_Price', 'reorderlevel', 'qty'),
+                           yscrollcommand=scrollbarY.set)
+
+
+    scrollbarY.config(command=header.yview)
+    scrollbarY.pack(side='right', fill=Y)
+    header.pack(fill=BOTH, expand=1)
+
+    header.config(show='headings')
+    header.heading('id', text='')
+    header.heading('InventoryID', text='Inventory ID')
+    header.heading('ItemName', text='Item Name')
+    header.heading('Description', text='Description')
+    header.heading('Unit_Price', text='Unit Price')
+    header.heading('reorderlevel', text='Reorder Level')
+    header.heading('qty', text='Quantity')
+
+    # Fetch and display data when the window is first created
+    fetch_data()
+
+    # Adjust column widths
+    for col in header['columns']:
+        header.column(col, width=95, anchor='center', stretch=False)
+    header.column('id', width=0, stretch=False)
+
+    # Convert to Excel Button
+    convertbutton = CTkButton(inventoryRecord, text="CONVERT TO EXCEL", width=200,
+                              height=60, font=("arial", 14, 'bold'), border_width=2, border_color='white',
+                              fg_color="#f2b62a", hover_color='#729762', bg_color='#303030', text_color='black')
+    convertbutton.place(x=860, y=570)
+
+    # Delete Button (Placeholder, no functionality yet)
+    deletebutton = CTkButton(inventoryRecord, text="DELETE", width=200,
+                             height=60, font=("arial", 14, 'bold'), border_width=2, border_color='white',
+                             fg_color="#f2b62a", hover_color='#729762', bg_color='#303030', text_color='black')
+    deletebutton.place(x=650, y=570)
 
 
 #------------------------------------------------------------------------------------------------------------------
@@ -1360,13 +1509,12 @@ clock()
 #VIEW EMPLOYEE (FUNCTION)
 #MAIN WINDOW
 #slider
-style = ttk.Style()
-style.theme_use("breeze")
+#style = ttk.Style()
+#style.theme_use("breeze")
 #style.configure('Treeview.Heading',background='#557C56',foreground='black',font=('Times new roman',14,'bold'))
 style.map('Treeview.Heading',background=[('active','#6A9C89')])
 style.configure("Treeview",background='white',  #background sa treeview#foreground='white', #text color
                 rowheight=30, #nipis
-                fieldbackground='black',
                 fontstyle=('times new roman',35)
                 )
 style.map('Treeview',background=[('selected','#387478')]) #selected row
