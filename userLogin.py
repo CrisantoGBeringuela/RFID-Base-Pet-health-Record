@@ -25,44 +25,44 @@ def login():
         messagebox.showwarning('No user Found','Enter User Correctly')
 
 
-bgpicture = CTkImage(dark_image=Image.open('bg1.jpg'),size=(1400,800))
+bgpicture = CTkImage(dark_image=Image.open(r'masterfilepicture\bg1.jpg'),size=(1400,800))
 bgpicturelabel = CTkLabel(root, image=bgpicture,text='')
 bgpicturelabel.place (x=0,y=0)
 
 #PET PICTURE FRAME AND LOGO
-vetpicture = CTkImage(dark_image=Image.open('pic1.png'),size=(200,200))
+vetpicture = CTkImage(dark_image=Image.open(r'petsample\pic1.png'),size=(200,200))
 vetpicturelabel = CTkLabel(root, image=vetpicture,text='')
 vetpicturelabel.place (x=70,y=60)
 
-vetpicture = CTkImage(dark_image=Image.open('pic2.png'),size=(200,200))
+vetpicture = CTkImage(dark_image=Image.open(r'petsample\pic2.png'),size=(200,200))
 vetpicturelabel = CTkLabel(root, image=vetpicture,text='')
 vetpicturelabel.place (x=275,y=60)
 
-vetpicture = CTkImage(dark_image=Image.open('pic3.png'),size=(200,200))
+vetpicture = CTkImage(dark_image=Image.open(r'petsample\pic3.png'),size=(200,200))
 vetpicturelabel = CTkLabel(root, image=vetpicture,text='')
 vetpicturelabel.place (x=480,y=60)
 
-vetpicture = CTkImage(dark_image=Image.open('pic4.png'),size=(200,200))
+vetpicture = CTkImage(dark_image=Image.open(r'petsample\pic4.png'),size=(200,200))
 vetpicturelabel = CTkLabel(root, image=vetpicture,text='')
 vetpicturelabel.place (x=70,y=265)
 
-vetpicture = CTkImage(dark_image=Image.open('logo.png'),size=(200,200))
+vetpicture = CTkImage(dark_image=Image.open(r'petsample\logo.png'),size=(200,200))
 vetpicturelabel = CTkLabel(root, image=vetpicture,text='')
 vetpicturelabel.place (x=275,y=265)
 
-vetpicture = CTkImage(dark_image=Image.open('pic5.png'),size=(200,200))
+vetpicture = CTkImage(dark_image=Image.open(r'petsample\pic5.png'),size=(200,200))
 vetpicturelabel = CTkLabel(root, image=vetpicture,text='')
 vetpicturelabel.place (x=480,y=265)
 
-vetpicture = CTkImage(dark_image=Image.open('pic6.png'),size=(200,200))
+vetpicture = CTkImage(dark_image=Image.open(r'petsample\pic6.png'),size=(200,200))
 vetpicturelabel = CTkLabel(root, image=vetpicture,text='')
 vetpicturelabel.place (x=70,y=470)
 
-vetpicture = CTkImage(dark_image=Image.open('pic7.png'),size=(200,200))
+vetpicture = CTkImage(dark_image=Image.open(r'petsample\pic7.png'),size=(200,200))
 vetpicturelabel = CTkLabel(root, image=vetpicture,text='')
 vetpicturelabel.place (x=275,y=470)
 
-vetpicture = CTkImage(dark_image=Image.open('pic8.png'),size=(200,200))
+vetpicture = CTkImage(dark_image=Image.open(r'petsample\pic8.png'),size=(200,200))
 vetpicturelabel = CTkLabel(root, image=vetpicture,text='')
 vetpicturelabel.place (x=480,y=470)
 
@@ -71,7 +71,7 @@ loginFrame = CTkFrame(root, width=350, height=480,fg_color="#F6F5F2",border_colo
 loginFrame.place(x=830,y=100)
 
 
-ctk_image = CTkImage(dark_image=Image.open('pawprint.png'), size=(100, 100))
+ctk_image = CTkImage(dark_image=Image.open(r'logo\pawprint.png'), size=(100, 100))
 image_label = CTkLabel(loginFrame, image=ctk_image, text="")
 image_label.place(x=130,y=15)
 
@@ -95,7 +95,7 @@ passentry.place(x=30,y=290)
 
 
 
-loginpic = Image.open('enter1.png')
+loginpic = Image.open(r'logo\enter1.png')
 resized_loginpic = CTkImage(light_image=loginpic,size = (45,45))
 Submit = CTkButton(loginFrame,text='LOGIN',
                    font=("arial",20,'bold'),
