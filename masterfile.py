@@ -916,6 +916,61 @@ def inventory_section():
         finally:
             cursor.close()
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # STOCK ORDERING (DELETE DATA)
+    def delete_button():
+        indexing = header.focus()
+        content = header.item(indexing)
+        if not content['values']:
+            messagebox.showerror('Error', 'No record selected',parent= inventoryRecord)
+            return
+
+        content_id = content['values'][1]
+        confirm = messagebox.askyesno('Confirm',
+                                      f'Are you sure you want to delete the record with Inventory no. {content_id}?',parent= inventoryRecord)
+        if not confirm:
+            return
+        try:
+            cursor =conn.cursor()
+            query = 'DELETE FROM tb_stockordering WHERE InventoryID = %s'
+            cursor.execute(query, (content_id,))
+            conn.commit()
+            cursor.close()
+
+            messagebox.showinfo('DELETED', f'The record with InventoryID {content_id} was deleted successfully',parent= inventoryRecord)
+            fetch_data()
+        except Exception as e:
+            messagebox.showerror('Error', f'An error occurred: {e}')
+
+    def convert_excel():
+        # Ask where to save the file
+        file_path = filedialog.asksaveasfilename(defaultextension='.xlsx',
+                                                 filetypes=[("Excel files", "*.xlsx")])
+        if not file_path:
+            return
+
+        # Get selected rows
+        selected_items = header.selection()  # Assuming Treeview is named `header`
+        if not selected_items:
+            messagebox.showwarning("No selection", "Please select rows to export.")
+            return
+
+        export_rows = []
+
+        for item in selected_items:
+            row_data = header.item(item, 'values')
+            inventory_id = row_data[1]
+
+            export_rows.append(row_data)
+
+        # Define column names based on your Treeview
+        columns = ['id', 'InventoryID', 'Item Name', 'Description', 'Unit Price', 'Reorder Level', 'Quantity']
+
+        table = pandas.DataFrame(export_rows, columns=columns)
+        table.to_excel(file_path, index=False)
+
+        messagebox.showinfo("Success", f"Selected data has been exported to:\n{file_path}")
+
     # Create a new window for the inventory section
     inventoryRecord = CTkToplevel(window)
     inventoryRecord.geometry('1100x830+300+150')
@@ -990,13 +1045,13 @@ def inventory_section():
     header.column('id', width=0, stretch=False)
 
     # Convert to Excel Button
-    convertbutton = CTkButton(inventoryRecord, text="CONVERT TO EXCEL", width=200,
+    convertbutton = CTkButton(inventoryRecord, text="CONVERT TO EXCEL", width=200,command=convert_excel,
                               height=60, font=("arial", 14, 'bold'), border_width=2, border_color='white',
                               fg_color="#f2b62a", hover_color='#729762', bg_color='#303030', text_color='black')
     convertbutton.place(x=860, y=570)
 
-    # Delete Button (Placeholder, no functionality yet)
-    deletebutton = CTkButton(inventoryRecord, text="DELETE", width=200,
+
+    deletebutton = CTkButton(inventoryRecord, text="DELETE", width=200, command=delete_button,
                              height=60, font=("arial", 14, 'bold'), border_width=2, border_color='white',
                              fg_color="#f2b62a", hover_color='#729762', bg_color='#303030', text_color='black')
     deletebutton.place(x=650, y=570)
