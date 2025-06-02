@@ -202,7 +202,7 @@ def update_button():
     update_window.resizable(False, False)
     update_window.grab_set()
 
-    editpet_BG = CTkImage(dark_image=Image.open(r'masterfilepicture\edit_information.jpg'), size=(1440,490))
+    editpet_BG = CTkImage(dark_image=Image.open(r'D:\Python\RFID-Base-Pet-health-Record-main\masterfilepicture\edit_information.jpg'), size=(1440,490))
     edit_BGLabel = CTkLabel(update_window, image=editpet_BG, text='')
     edit_BGLabel.place(x=0, y=0)
 
@@ -305,7 +305,7 @@ def show_pet_details():
                 details_window.resizable(False, False)
                 details_window.grab_set()
 
-                details_windowBG = CTkImage(dark_image=Image.open(r'masterfilepicture\petdetails.jpg'), size=(1400, 650))
+                details_windowBG = CTkImage(dark_image=Image.open(r'D:\Python\RFID-Base-Pet-health-Record-main\masterfilepicture\petdetails.jpg'), size=(1400, 650))
                 details_windowBGLabel = CTkLabel(details_window, image=details_windowBG, text='')
                 details_windowBGLabel.place(x=0, y=0)
 
@@ -419,7 +419,7 @@ def show_pet_details():
                     edit_window.grab_set()
 
                     edit_window_image = CTkImage(
-                        dark_image=Image.open(r'masterfilepicture\editremarks.jpg'), size=(400, 400))
+                        dark_image=Image.open(r'D:\Python\RFID-Base-Pet-health-Record-main\masterfilepicture\editremarks.jpg'), size=(400, 400))
                     edit_windowLabel = CTkLabel(edit_window,image=edit_window_image, text='')
                     edit_windowLabel.place(x=0, y=0)
 
@@ -507,7 +507,7 @@ def show_pet_details():
                             full_diagnosis_window.grab_set()
 
                             full_diagnosis_window_image = CTkImage(
-                                dark_image=Image.open(r'masterfilepicture\remarks&diagnosis.jpg'), size=(500, 300))
+                                dark_image=Image.open(r'D:\Python\RFID-Base-Pet-health-Record-main\masterfilepicture\remarks&diagnosis.jpg'), size=(500, 300))
                             full_diagnosis_windowLabel = CTkLabel(full_diagnosis_window,
                                                                   image=full_diagnosis_window_image, text='')
                             full_diagnosis_windowLabel.place(x=0, y=0)
@@ -710,7 +710,7 @@ def addpetinfo():
     addpet_window.resizable(False, False)
     addpet_window.grab_set()
 
-    addpet_BG = CTkImage(dark_image=Image.open(r'masterfilepicture\bgsample.jpg'),size=(1440,490))
+    addpet_BG = CTkImage(dark_image=Image.open(r'D:\Python\RFID-Base-Pet-health-Record-main\masterfilepicture\bgsample.jpg'),size=(1440,490))
     addpet_BGLabel = CTkLabel(addpet_window,image=addpet_BG,text='')
     addpet_BGLabel.place(x=0,y=0)
     #for ownersFrame
@@ -992,7 +992,7 @@ def inventory_section():
     inventoryRecord.resizable(False, False)
     inventoryRecord.grab_set()
 
-    view_inventory = CTkImage(dark_image=Image.open(r'masterfilepicture\stockordering.jpg'), size=(1100, 900))
+    view_inventory = CTkImage(dark_image=Image.open(r'D:\Python\RFID-Base-Pet-health-Record-main\masterfilepicture\stockordering.jpg'), size=(1100, 900))
     view_inventorylabel = CTkLabel(inventoryRecord, image=view_inventory, text='')
     view_inventorylabel.place(x=0, y=0)
 
@@ -1145,7 +1145,7 @@ def add_petdiagnosis():
     addpet_window.grab_set()
     addpet_window.geometry('870x400+330+380')
 
-    addpetBG = CTkImage(dark_image=Image.open(r'masterfilepicture\rfidremarks.jpg'), size=(900, 400))
+    addpetBG = CTkImage(dark_image=Image.open(r'D:\Python\RFID-Base-Pet-health-Record-main\masterfilepicture\rfidremarks.jpg'), size=(900, 400))
     addpetBGlabel = CTkLabel(addpet_window, image=addpetBG, text='')
     addpetBGlabel.place(x=0, y=0)
 
@@ -1209,7 +1209,7 @@ def connect_database():
     connectwindow.title('Database Connection')
     connectwindow.grab_set()
 
-    databaseBGpicture= CTkImage(dark_image=Image.open(r'logo\database-management.png'), size=(80, 80))
+    databaseBGpicture= CTkImage(dark_image=Image.open(r'D:\Python\RFID-Base-Pet-health-Record-main\logo\database-management.png'), size=(80, 80))
     databaseBG = CTkLabel(connectwindow, image=databaseBGpicture, text='')
     databaseBG.place(x=170, y=30)
 
@@ -1305,7 +1305,7 @@ def addnewEmployee():
     addnewEmployee.resizable(False, False)
     addnewEmployee.grab_set()
 
-    employeeBG = CTkImage(dark_image=Image.open(r'employeestaff\employeeBG.jpg'), size=(750, 750))
+    employeeBG = CTkImage(dark_image=Image.open(r'D:\Python\RFID-Base-Pet-health-Record-main\masterfilepicture\employeeBG.jpg'), size=(750, 750))
     employeeBGlabel = CTkLabel(addnewEmployee, image=employeeBG, text='')
     employeeBGlabel.place(x=0, y=0)
 
@@ -1411,7 +1411,7 @@ def view_employeeRecord():
         edit_addnewEmployee.resizable(False, False)
         edit_addnewEmployee.grab_set()
 
-        employeeBG = CTkImage(dark_image=Image.open(r'employeestaff\editemployeerecord.jpg'), size=(750, 750))
+        employeeBG = CTkImage(dark_image=Image.open(r'D:\Python\RFID-Base-Pet-health-Record-main\masterfilepicture\editemployeerecord.jpg'), size=(750, 750))
         employeeBGlabel = CTkLabel(edit_addnewEmployee, image=employeeBG, text='')
         employeeBGlabel.place(x=0, y=0)
 
@@ -1509,7 +1509,7 @@ def view_employeeRecord():
         details_window.resizable(False, False)
         details_window.grab_set()
 
-        full_employeeBG = CTkImage(dark_image=Image.open(r'employeestaff\fullemployeeinformation.jpg'), size=(650, 500))
+        full_employeeBG = CTkImage(dark_image=Image.open(r'D:\Python\RFID-Base-Pet-health-Record-main\masterfilepicture\fullemployeeinformation.jpg'), size=(650, 500))
         full_employeeBGlabel = CTkLabel(details_window, image=full_employeeBG, text='')
         full_employeeBGlabel.place(x=0, y=0)
 
@@ -1546,7 +1546,7 @@ def view_employeeRecord():
     employeeRecord.resizable(False, False)
     employeeRecord.grab_set()
 
-    view_employeeBG = CTkImage(dark_image=Image.open(r'employeestaff\employee_list.jpg'), size=(500, 500))
+    view_employeeBG = CTkImage(dark_image=Image.open(r'D:\Python\RFID-Base-Pet-health-Record-main\masterfilepicture\employee_list.jpg'), size=(500, 500))
     view_employeeBGlabel = CTkLabel(employeeRecord, image=view_employeeBG, text='')
     view_employeeBGlabel.place(x=0, y=0)
 
@@ -1709,7 +1709,7 @@ def show_event_details(event):
             detail_win.geometry("400x400+800+400")
             detail_win.grab_set()
 
-            detailimage = CTkImage(dark_image=Image.open(r'masterfilepicture\todo.jpg'), size=(400,400))
+            detailimage = CTkImage(dark_image=Image.open(r'D:\Python\RFID-Base-Pet-health-Record-main\masterfilepicture\todo.jpg'), size=(400,400))
             detailimageLabel = CTkLabel(detail_win, image=detailimage, text='')
             detailimageLabel.place(x=0, y=0)
 
@@ -1739,7 +1739,7 @@ def show_event_details(event):
 
 #------------------------------------------------------------------------------------------------------------------
 #BACKGROUND (MAIN)
-bgpicture = CTkImage(dark_image=Image.open(r'masterfilepicture\main_background.jpg'), size=(1510, 694))
+bgpicture = CTkImage(dark_image=Image.open(r'D:\Python\RFID-Base-Pet-health-Record-main\masterfilepicture\main_background.jpg'), size=(1510, 694))
 bgpicturelabel = CTkLabel(window, image=bgpicture, text='')
 bgpicturelabel.place(x=0, y=0)
 #------------------------------------------------------------------------------------------------------------------
@@ -1800,13 +1800,13 @@ leftside = CTkFrame(window,width=250,height=800,fg_color='#C1D8C3')
 leftside.place(x=0,y=0)
 #------------------------------------------------------------------------------------------------------------------
 #LEFT SIDE BUTTON
-adminpic = CTkImage(light_image=Image.open(r'masterfilepicture\lakeview.jpg'),size = (253,120))
+adminpic = CTkImage(light_image=Image.open(r'D:\Python\RFID-Base-Pet-health-Record-main\masterfilepicture\lakeview.jpg'),size = (253,120))
 helloadmin=CTkLabel(window,text="",image=adminpic)
 helloadmin.place(x=0,y=0)
 
 #------------------------------------------------------------------------------------------------------------------
 #PET CARE TAB
-addpetpic = CTkImage(light_image=Image.open(r'logo\kitten.png'),size = (35,35))
+addpetpic = CTkImage(light_image=Image.open(r'D:\Python\RFID-Base-Pet-health-Record-main\logo\kitten.png'),size = (35,35))
 
 petinfotabtext=CTkLabel(window,text=" PET CARE TAB",fg_color='#C1D8C3',image=addpetpic,compound='left',font=('times new roman',17,'bold'),text_color='#1A5319')
 petinfotabtext.place(x=0,y=130)
@@ -1821,7 +1821,7 @@ exportbutton.place(x=0,y=290)
 
 #------------------------------------------------------------------------------------------------------------------
 #EMPLOYEE / STAFF TAB
-staffpic = CTkImage(light_image=Image.open(r'logo\staff.png'),size = (35,35))
+staffpic = CTkImage(light_image=Image.open(r'D:\Python\RFID-Base-Pet-health-Record-main\logo\staff.png'),size = (35,35))
 
 employeetext=CTkLabel(window,text=" EMPLOYEE/STAFF",fg_color='#C1D8C3',image=staffpic,compound='left',font=('times new roman',17,'bold'),text_color='#1A5319')
 employeetext.place(x=0,y=344)
@@ -1834,7 +1834,7 @@ staffinfo.place(x=0,y=425)
 #------------------------------------------------------------------------------------------------------------------
 # INVENTORY TAB
 
-inventorypic = CTkImage(light_image=Image.open(r'logo\inventory.png'),size = (35,35))
+inventorypic = CTkImage(light_image=Image.open(r'D:\Python\RFID-Base-Pet-health-Record-main\logo\inventory.png'),size = (35,35))
 
 inventorytext=CTkLabel(window,text=" INVENTORY SECTION",fg_color='#C1D8C3',image=inventorypic,compound='left',font=('times new roman',17,'bold'),text_color='#1A5319')
 inventorytext.place(x=0,y=474)
@@ -1844,7 +1844,7 @@ inventoryrecord.place(x=0,y=515)
 #------------------------------------------------------------------------------------------------------------------
 
 # SERVER MANAGER TAB
-managementpic = CTkImage(light_image=Image.open(r'logo\management.png'),size = (35,35))
+managementpic = CTkImage(light_image=Image.open(r'D:\Python\RFID-Base-Pet-health-Record-main\logo\management.png'),size = (35,35))
 servertext=CTkLabel(window,text=" SERVER CONNECTION",fg_color='#C1D8C3',image=managementpic,compound='left',font=('times new roman',17,'bold'),text_color='#1A5319')
 servertext.place(x=0,y=565)
 
